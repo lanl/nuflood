@@ -9,7 +9,6 @@
 #include "isinks.h"
 #include "itime.h"
 
-// Forward declaration.
 class IConstants;
 class ISinks;
 

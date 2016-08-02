@@ -10,12 +10,16 @@ ISources::ISources(const rapidjson::Value& root, const IConstants& constants) {
 			const rapidjson::Value& points_json = source_json["points"];
 			assert(points_json.IsArray());
 			for (rapidjson::SizeType i = 0; i < points_json.Size(); i++) {
+				// Both coordinates should be in decimal degrees.
 				double x = points_json[i]["x"].GetDouble();
 				double y = points_json[i]["y"].GetDouble();
+
+				// Hydrograph is read in assuming units of (s, m^3 / s).
 				std::string path = points_json[i]["hydrograph"].GetString();
 				PointSource<prec_t> point_source(x, y, File(path));
-				prec_t cfs_to_m_per_s = (prec_t)((1.0 / 35.31467) / (constants.cellsize_x()*constants.cellsize_y()));
-				point_source.Scale(cfs_to_m_per_s);
+
+				// Convert rate from m^3 / s to m / s.
+				point_source.Scale((prec_t)(1.0 / constants.cell_area()));
 				points_.push_back(point_source);
 			}
 		}
@@ -33,13 +37,15 @@ ISources::ISources(const rapidjson::Value& root, const IConstants& constants) {
 			File rainfall_grid_file;
 			ReadParameter(rainfall_json, "grid", rainfall_grid_file);
 			if (!rainfall_grid_file.IsEmpty()) {
+				// Assumes units of meters.
 				rainfall_grid_.Load(rainfall_grid_file);
-				rainfall_grid_.Scale((prec_t)0.0254); // Scale from inches to meters.
 			}
 
 			File storm_curve_file;
 			ReadParameter(rainfall_json, "stormCurve", storm_curve_file);
+
 			if (!storm_curve_file.IsEmpty()) {
+				// Assumes unitless time series.
 				storm_curve_.Load(storm_curve_file);
 			}
 		}

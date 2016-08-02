@@ -1,15 +1,10 @@
 #pragma once
 
-#ifdef BIG_GRID
-#define INT_TYPE long unsigned int
-#else
-#define INT_TYPE unsigned int
-#endif
-
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 #include <utility>
+#include "precision.h"
 
 typedef std::unordered_map<INT_TYPE, std::unordered_set<INT_TYPE> > Map;
 

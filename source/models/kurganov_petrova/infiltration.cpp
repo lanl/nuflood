@@ -2,7 +2,7 @@
 #include "infiltration.h"
 
 Infiltration::Infiltration(const rapidjson::Value& root, const Topography& topography) {
-	K_value_ = (prec_t)0; // Units are mm/h.
+	K_value_ = (prec_t)0; // Units are m/s.
 	psi_value_ = (prec_t)0; // Units are m.
 	dtheta_value_ = (prec_t)0; // Unitless (volume/volume).
 
@@ -16,16 +16,13 @@ Infiltration::Infiltration(const rapidjson::Value& root, const Topography& topog
 		ReadParameter(infiltration_json, "moistureDeficitValue", dtheta_value_);
 	}
 
-	prec_t mm_per_h_to_m_per_s = (prec_t)(1.0 / (1000.0 * 3600.0));
 	if (!K_file_.IsEmpty()) {
+		// Assumes units of m/s.
 		K_grid_.Load(K_file_);
 		K_grid_.BilinearInterpolate();
 		K_grid_.AddBoundaries();
-		K_grid_.Scale(mm_per_h_to_m_per_s);
 		K_grid_.set_name("hydraulicConductivity");
 		K_value_ = (prec_t)0; // If a hydraulic conductivity grid has been defined, reset K_value_ to zero.
-	} else if (K_value_ > (prec_t)0) {
-		K_value_ *= mm_per_h_to_m_per_s;
 	}
 
 	if (!psi_file_.IsEmpty()) {

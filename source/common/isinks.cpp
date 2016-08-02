@@ -22,11 +22,13 @@ ISinks::ISinks(const rapidjson::Value& root, const IConstants& constants) {
 				if (points_json[i].HasMember("name")) {
 					name = points_json[i]["name"].GetString();
 				}
-				
+
+				// Drainage rate is read in assuming units of m^3 / s.
 				prec_t rate = (prec_t)points_json[i]["rate"].GetDouble();
 				PointSink<prec_t> point_sink(x, y, rate, depth, name);
-				prec_t cfs_to_m_per_s = (prec_t)((1.0 / 35.31467) / (constants.cellsize_x()*constants.cellsize_y()));
-				point_sink.Scale(cfs_to_m_per_s);
+
+				// Convert rate from m^3 / s to m / s.
+				point_sink.Scale((prec_t)(1.0 / constants.cell_area()));
 				points_.push_back(point_sink);
 			}
 		}

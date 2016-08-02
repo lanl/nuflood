@@ -22,7 +22,6 @@ public:
 	const prec_t storm_curve_proportion(void) const { return storm_curve_proportion_; }
 
 protected:
-   // Point source data.
 	std::vector< PointSource<prec_t> > points_;
 	Grid<prec_t> rainfall_grid_;
 	TimeSeries<prec_t> storm_curve_;

@@ -20,7 +20,6 @@
 template<class T>
 class Grid {
 public:
-	//Grid(void);
 	Grid(const File& file);
 	Grid(const INT_TYPE num_columns = 0, const INT_TYPE num_rows = 0,
 	     const double x_lower_left = 0.0, const double y_lower_left = 0.0,

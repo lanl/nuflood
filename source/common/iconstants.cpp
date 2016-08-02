@@ -25,6 +25,7 @@ IConstants::IConstants(const rapidjson::Value& root, const ITopography& topograp
 		cellsize_y_ = (prec_t)topography.elevation().cellsize() * 6378137.0*3.1415927 / 180.0;
 	}
 
+	cell_area_ = cellsize_x_ * cellsize_y_;
 	num_columns_ = topography.elevation().num_columns();
 	num_rows_ = topography.elevation().num_rows();
 	num_cells_ = (unsigned long)topography.elevation().num_columns() *
