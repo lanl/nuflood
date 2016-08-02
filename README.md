@@ -39,6 +39,6 @@ docker run -it --rm nuflood /bin/bash
 ```
 
 ## License
-BSD-ish. See https://github.com/losalamos/nuflood/blob/master/LICENSE.md
+BSD-ish. [See here](https://github.com/losalamos/nuflood/blob/master/LICENSE.md)
 
 LA-CC-15-008
