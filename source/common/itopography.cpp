@@ -8,7 +8,8 @@ ITopography::ITopography(const rapidjson::Value& root) {
 	if (root.HasMember("topography")) {
 		const rapidjson::Value& json = root["topography"];
 
-		ReadParameter(root, "metric", metric_);
+		ReadParameter(json, "metric", metric_);
+
 		if (json.HasMember("elevationFile")) {
 			elevation_.Load(File(json["elevationFile"].GetString()));
 		} else {
