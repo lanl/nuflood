@@ -3,10 +3,9 @@
 #include "file.h"
 
 Document::Document(const File& file) {
-  FILE* p_file = fopen(file.path().c_str(), "r");
-
-  char buffer[65536];
-  rapidjson::FileReadStream file_read_stream(p_file, buffer, sizeof(buffer));
+	FILE* p_file = fopen(file.path().c_str(), "r");
+	char buffer[65536];
+	rapidjson::FileReadStream file_read_stream(p_file, buffer, sizeof(buffer));
 	root.ParseStream<0>(file_read_stream);
 	fclose(p_file);
 

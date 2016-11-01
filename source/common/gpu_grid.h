@@ -80,11 +80,11 @@ inline void GpuGrid<T>::CopyFromCpuGrid(const Grid<T>& reference_grid) {
 		grid_dim_.y = ((reference_grid.num_rows()+1) + (block_dim_.y + 1)) / block_dim_.y;
 
 		// Adding two cells in each direction removes problems we could encounter
-		// at the right and top boundaries (since each block requires data from two
-		// extra cells in each direction), and the boundary cells themselves are
-		// contained within the grid (defined by the quantities above). Note that
-		// the CPU grid from which we reference should already be extended to
-		// contain boundary cells (two in each direction), and these are not
+		// at the right and top boundaries (since each block requires data from
+		// two extra cells in each direction), and the boundary cells themselves
+		// are contained within the grid (defined by the quantities above). Note
+		// that the CPU grid from which we reference should already be extended
+		// to contain boundary cells (two in each direction), and these are not
 		// included here.
 		num_columns_ = block_dim_.x*grid_dim_.x + 2;
 		num_rows_    = block_dim_.y*grid_dim_.y + 2;

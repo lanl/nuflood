@@ -1,11 +1,5 @@
 #pragma once
 
-#ifdef BIG_GRID
-#define INT_TYPE long unsigned int
-#else
-#define INT_TYPE unsigned int
-#endif
-
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -16,6 +10,7 @@
 #include "error.h"
 #include "file.h"
 #include "folder.h"
+#include "precision.h"
 
 template<class T>
 class Grid {

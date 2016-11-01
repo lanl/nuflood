@@ -35,7 +35,7 @@ if(WIN32)
 	set(TARGET_ARCHITECTURE "x86")
 endif()
 
-find_package(CUDA)
+#find_package(CUDA)
 if(CUDA_FOUND)
 	#add_definitions(-DCUDA)
 	include_directories(${CUDA_INCLUDE_DIRS})

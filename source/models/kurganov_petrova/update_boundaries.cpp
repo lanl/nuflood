@@ -263,10 +263,10 @@ inline void UpdateWestBoundaryCriticalDepth(const Constants& C, const Topography
 		prec_t w_new;
 		prec_t h = w[west_p2] - Bi[west_p2];
 		if (fabsf(hu[west_p2]) > (prec_t)0 && h > (prec_t)0) {
-			// The Froude number, F, can be defined by u / sqrt(g*h). Critical depth
-			// occurs at a Froude number of unity. Thus, for a critical depth
-			// boundary condition, 1 = u^2 / (g*h). We simply need to set h with
-			// respect to v, i.e., h = u^2 / g, or h = (hu)*(hu) / (g * h*h).
+			// The Froude number, F, can be defined by u / sqrt(g*h). Critical
+			// depth occurs at a Froude number of unity. Thus, for a critical
+			// depth boundary condition, 1 = u^2 / (g*h). We simply need to set h
+			// with respect to u, i.e., h = u^2 / g, or h = (hu)*(hu) / (g * h*h).
 			prec_t h_c = (hu[west_p2]*hu[west_p2]) / (C.gravitational_acceleration() * h*h);
 			h_c = fminf(h, h_c);
 			w_new = Bi[west_p2] + h_c;

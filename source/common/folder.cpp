@@ -4,7 +4,9 @@
 #include "error.h"
 #include "folder.h"
 
-Folder::Folder(void) : path_("") { }
+Folder::Folder(void) {
+	path_ = "";
+}
 
 Folder::Folder(const std::string& path) {
 	Set(path);
