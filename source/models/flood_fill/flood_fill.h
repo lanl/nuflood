@@ -12,7 +12,6 @@ public:
 private:
 	void Grow(void);
 	void UpdateWetCells(void);
-	void Reclassify(void);
 
 	Folder output_folder_;
 	INT_TYPE num_seeds_, num_wet_;
