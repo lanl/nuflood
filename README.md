@@ -6,10 +6,10 @@
 | :---------------: | :-------------------: |
 | ![lin-badge]      | ![cov-badge]          |
 
-[lin-badge]: https://travis-ci.org/losalamos/nuflood.svg?branch=master "Travis build status"
-[lin-link]: https://travis-ci.org/losalamos/nuflood "Travis build status"
-[cov-badge]: https://codecov.io/gh/losalamos/nuflood/branch/master/graph/badge.svg
-[cov-link]: https://codecov.io/gh/losalamos/nuflood
+[lin-badge]: https://travis-ci.org/lanl/nuflood.svg?branch=master "Travis build status"
+[lin-link]: https://travis-ci.org/lanl/nuflood "Travis build status"
+[cov-badge]: https://codecov.io/gh/lanl/nuflood/branch/master/graph/badge.svg
+[cov-link]: https://codecov.io/gh/lanl/nuflood
 
 ## Installation
 
@@ -39,6 +39,6 @@ docker run -it --rm nuflood /bin/bash
 ```
 
 ## License
-[BSD-ish](https://github.com/losalamos/nuflood/blob/master/LICENSE.md)
+[BSD-ish](https://github.com/lanl/nuflood/blob/master/LICENSE.md)
 
 LA-CC-15-008
