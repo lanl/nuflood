@@ -72,7 +72,7 @@ void UpdateBoundaries(const BoundaryConditions& BC, const Constants& C, const To
 }
 
 inline void UpdateEastBoundaryOpen(const Constants& C, Conserved& U) {
-	//static prec_t*  w = U. w().data();
+	static prec_t*  w = U. w().data();
 	static prec_t* hu = U.hu().data();
 	static prec_t* hv = U.hv().data();
 
@@ -86,9 +86,11 @@ inline void UpdateEastBoundaryOpen(const Constants& C, Conserved& U) {
 		INT_TYPE east_m1 = j*num_columns + (num_columns-2);
 		INT_TYPE east_m2 = j*num_columns + (num_columns-3);
 
+		 w[east] =  w[east_m2];
 		hu[east] = hu[east_m2];
 		hv[east] = hv[east_m2];
 
+		 w[east_m1] =  w[east_m2];
 		hu[east_m1] = hu[east_m2];
 		hv[east_m1] = hv[east_m2];
 	}
@@ -190,7 +192,7 @@ inline void UpdateEastBoundaryMarigram(const Constants& C, const Topography& B, 
 }
 
 inline void UpdateWestBoundaryOpen(const Constants& C, Conserved& U) {
-	//static prec_t*  w = U. w().data();
+	static prec_t*  w = U. w().data();
 	static prec_t* hu = U.hu().data();
 	static prec_t* hv = U.hv().data();
 
@@ -204,9 +206,11 @@ inline void UpdateWestBoundaryOpen(const Constants& C, Conserved& U) {
 		INT_TYPE west_p1 = j*num_columns + 1;
 		INT_TYPE west_p2 = j*num_columns + 2;
 
+		 w[west] =  w[west_p2];
 		hu[west] = hu[west_p2];
 		hv[west] = hv[west_p2];
 
+		 w[west_p1] =  w[west_p2];
 		hu[west_p1] = hu[west_p2];
 		hv[west_p1] = hv[west_p2];
 	}
@@ -311,7 +315,7 @@ inline void UpdateWestBoundaryMarigram(const Constants& C, const Topography& B, 
 }
 
 inline void UpdateNorthBoundaryOpen(const Constants& C, Conserved& U) {
-	//static prec_t*  w = U. w().data();
+	static prec_t*  w = U. w().data();
 	static prec_t* hu = U.hu().data();
 	static prec_t* hv = U.hv().data();
 
@@ -325,9 +329,11 @@ inline void UpdateNorthBoundaryOpen(const Constants& C, Conserved& U) {
 		INT_TYPE north_m1 = (num_rows-2)*num_columns + i;
 		INT_TYPE north_m2 = (num_rows-3)*num_columns + i;
 
+		 w[north] =  w[north_m2];
 		hu[north] = hu[north_m2];
 		hv[north] = hv[north_m2];
 
+		 w[north_m1] =  w[north_m2];
 		hu[north_m1] = hu[north_m2];
 		hv[north_m1] = hv[north_m2];
 	}
@@ -432,7 +438,7 @@ inline void UpdateNorthBoundaryMarigram(const Constants& C, const Topography& B,
 }
 
 inline void UpdateSouthBoundaryOpen(const Constants& C, Conserved& U) {
-	//static prec_t*  w = U. w().data();
+	static prec_t*  w = U. w().data();
 	static prec_t* hu = U.hu().data();
 	static prec_t* hv = U.hv().data();
 
@@ -445,9 +451,11 @@ inline void UpdateSouthBoundaryOpen(const Constants& C, Conserved& U) {
 		INT_TYPE south_p1 = 1*num_columns + i;
 		INT_TYPE south_p2 = 2*num_columns + i;
 
+		 w[south] =  w[south_p2];
 		hu[south] = hu[south_p2];
 		hv[south] = hv[south_p2];
 
+		 w[south_p1] =  w[south_p2];
 		hu[south_p1] = hu[south_p2];
 		hv[south_p1] = hv[south_p2];
 	}
