@@ -141,6 +141,11 @@ double Conserved::volume_computed(const Constants& C, const Infiltration& I) {
 	return volume_computed_;
 }
 
+void Conserved::WriteMaxGrids(const Output& output) {
+	output.WriteGridIfInList(h_max_);
+	output.WriteGridIfInList(q_max_);
+}
+
 void Conserved::WriteGrids(const Output& output, const prec_t current_time) {
 	output.WriteGridIfInList(current_time, w_);
 	output.WriteGridIfInList(current_time, w_old_);
@@ -150,6 +155,5 @@ void Conserved::WriteGrids(const Output& output, const prec_t current_time) {
 	output.WriteGridIfInList(current_time, hv_old_);
 	output.WriteGridIfInList(current_time, h_);
 	output.WriteGridIfInList(current_time, q_);
-	output.WriteGridIfInList(h_max_);
-	output.WriteGridIfInList(q_max_);
+	WriteMaxGrids(output);
 }

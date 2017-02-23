@@ -39,10 +39,15 @@ void KurganovPetrova::Step(void) {
 void KurganovPetrova::Run(void) {
 	timer.Reset();
 
-	while (time.current() < time.end() && time.iteration() < time.max_iterations()) {
+	while (time.current() < time.end() &&
+	       time.iteration() < time.max_iterations()) {
 		Step();
 	}
 
+	// Write updated maximal data before exiting.
+	conserved.WriteMaxGrids(output);
+
+	// Print summary statistics.
 	output.PrintSummary(time, constants, timer);
 }
 
@@ -55,7 +60,9 @@ void KurganovPetrova::Print(void) {
 		topography.WriteGrids(output);
 
 		// Output the sink data.
-		output.WriteSinkTimeSeries(sinks, time, constants);
+		if (output.write_sink_time_series()) {
+			output.WriteSinkTimeSeries(sinks, time, constants);
+		}
 
 		// Print extra user-specified information.
 		output.PrintInformation(time, conserved, topography, constants, infiltration);

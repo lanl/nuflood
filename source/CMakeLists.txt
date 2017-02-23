@@ -4,7 +4,7 @@ add_definitions(-DBIG_GRID=0)
 find_program (INTEL_COMPILER icc)
 if(INTEL_COMPILER)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11; -O3; -parallel; -openmp;
-	    -lpthread; -Wall; -g; -shared-intel; -debug inline-debug-info")
+	                     -lpthread; -Wall; -g; -shared-intel; -debug inline-debug-info")
 	if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC")
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC")
@@ -44,8 +44,8 @@ if(CUDA_FOUND)
 	list(APPEND LIBS ${CUDA_LIBRARIES})
 	set(CUDA_PROPAGATE_HOST_FLAGS OFF)
 	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11; -O3; -use_fast_math;
-	    -ftz=true; -prec-div=false; -prec-sqrt=false; -Xptxas -dlcm=ca;
-       -lineinfo; -Wno-deprecated-gpu-targets")
+	                     -ftz=true; -prec-div=false; -prec-sqrt=false; -Xptxas -dlcm=ca;
+	                     -lineinfo; -Wno-deprecated-gpu-targets")
 endif()
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

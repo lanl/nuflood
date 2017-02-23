@@ -16,6 +16,7 @@ public:
 	Conserved(const rapidjson::Value& root, const Topography& topography,
 	          const Constants& C, const Output& output);
 
+	void WriteMaxGrids(const Output& output);
 	void WriteGrids(const Output& output, const prec_t current_time);
 	// TODO: Needs to be fixed to use dx and dy.
 	double volume_computed(const Constants& C, const Infiltration& I);

@@ -31,6 +31,7 @@ public:
 	prec_t time_step(void) const { return time_step_; }
 	bool print_summary(void) const { return print_summary_; }
 	bool print_volume(void) const { return print_volume_added_ || print_volume_conservation_error_; }
+	bool write_sink_time_series(void) const { return write_sink_time_series_; }
 
 protected:
 	Folder folder_;
