@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef CUDA
+#ifdef __CUDACC__
 
 #define BLOCK_COLS 16
 #define BLOCK_ROWS 12

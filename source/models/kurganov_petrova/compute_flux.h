@@ -14,7 +14,7 @@
 #include "time.h"
 #include "active_cells.h"
 
-#ifdef CUDA
+#ifdef __CUDACC__
 #include <cuda.h>
 #include <cuda_runtime.h>
 #define HOST __host__

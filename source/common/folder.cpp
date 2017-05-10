@@ -16,7 +16,7 @@ void Folder::Set(std::string path) {
 	path_ = path;
 
 	if (!path_.empty() && *path_.rbegin() != '/') {
-    path_ = path_ + '/';
+		path_ = path_ + '/';
 	}
 
 	if (!Exists()) {

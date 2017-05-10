@@ -1,4 +1,5 @@
-#ifdef CUDA
+#ifdef __CUDACC__
+
 #include "error.h"
 #include "gpu_error.h"
 

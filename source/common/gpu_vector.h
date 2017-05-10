@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef CUDA
+#ifdef __CUDACC__
 
 #include <cuda.h>
 #include <cuda_runtime.h>

@@ -25,6 +25,7 @@ ITopography::ITopography(const rapidjson::Value& root) {
 
 void ITopography::WriteGrids(const IOutput& output) const {
 	static bool printed = false;
+
 	if (!printed) {
 		output.WriteGridIfInList(elevation_);
 		printed = true;
