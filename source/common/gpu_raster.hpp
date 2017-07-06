@@ -25,9 +25,7 @@ private:
 };
 
 template<class T>
-inline GpuRaster<T>::GpuRaster(std::string path, GDALAccess access) {
-	Raster<T>::Raster(path, access);
-
+inline GpuRaster<T>::GpuRaster(std::string path, GDALAccess access) : Raster<T>(path, access) {
 	gpu_block_dim_.x = BLOCK_COLS;
 	int width = Raster<T>::get_width();
 	gpu_grid_dim_.x = ((width + 1) + (gpu_block_dim_.x + 1)) / gpu_block_dim_.x;

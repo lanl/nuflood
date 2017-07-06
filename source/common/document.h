@@ -9,5 +9,6 @@
 class Document {
 public:
 	Document(const File& file);
+	Document(const std::string path);
 	rapidjson::Document root;
 };

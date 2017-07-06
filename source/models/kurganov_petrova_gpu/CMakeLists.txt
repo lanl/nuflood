@@ -16,4 +16,4 @@ else()
 	add_executable(${EXECUTABLE} ${SOURCE_FILES})
 endif()
 
-target_link_libraries(${EXECUTABLE} KurganovPetrovaGpu Common)
+target_link_libraries(${EXECUTABLE} ${LIBS} KurganovPetrovaGpu Common)

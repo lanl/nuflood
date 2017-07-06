@@ -13,3 +13,15 @@ Document::Document(const File& file) {
 		PrintErrorAndExit("File '" + file.path() + "' is not a valid JSON document.");
 	}
 }
+
+Document::Document(const std::string path) {
+	FILE* p_file = fopen(path.c_str(), "r");
+	char buffer[65536];
+	rapidjson::FileReadStream file_read_stream(p_file, buffer, sizeof(buffer));
+	root.ParseStream<0>(file_read_stream);
+	fclose(p_file);
+
+	if (!root.IsObject()) {
+		PrintErrorAndExit("File '" + path + "' is not a valid JSON document.");
+	}
+}
