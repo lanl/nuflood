@@ -2,6 +2,7 @@ add_definitions(-DUSE_DOUBLE=1)
 add_definitions(-DBIG_GRID=0)
 
 find_program (INTEL_COMPILER icc)
+
 if(INTEL_COMPILER)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11; -O3; -parallel; -openmp;
 	                     -lpthreads; -Wall; -g; -shared-intel;
@@ -33,6 +34,11 @@ if(WIN32)
 	add_definitions(-DUNICODE -D_UNICODE)
 	set(TARGET_ARCHITECTURE "x86")
 endif()
+
+find_package(GDAL REQUIRED)
+include_directories(${GDAL_INCLUDE_DIR})
+link_directories(${GDAL_LIBRARY})
+list(APPEND LIBS ${GDAL_LIBRARY})
 
 find_package(CUDA)
 if(CUDA_FOUND)
