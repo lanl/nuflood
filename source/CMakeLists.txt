@@ -46,10 +46,14 @@ if(CUDA_FOUND)
 	link_directories(${CUDA_LIBRARIES})
 	list(APPEND LIBS ${CUDA_LIBRARIES})
 	set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11; -O3; -use_fast_math;
-	                     -ftz=true; -prec-div=false; -prec-sqrt=false;
-	                     -Xptxas -dlcm=ca; -lineinfo;
-	                     -Wno-deprecated-gpu-targets")
+	IF(NOT(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Coverage"))
+		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11; -O3; -use_fast_math;
+									-ftz=true; -prec-div=false; -prec-sqrt=false;
+									-Xptxas -dlcm=ca; -lineinfo;
+									-Wno-deprecated-gpu-targets")
+	ELSE()
+		set(CUDA_NVCC_FLAGS "-std=c++11 -g -O0")
+	ENDIF()
 endif()
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

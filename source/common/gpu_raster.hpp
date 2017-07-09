@@ -15,6 +15,16 @@ public:
 	GpuRaster(const GpuRaster& raster, std::string path, GDALAccess access = GA_ReadOnly);
 	~GpuRaster(void);
 
+	T* get_gpu_array(void) const { return gpu_array_; }
+	dim3 get_gpu_block_dim(void) const { return gpu_block_dim_; }
+	dim3 get_gpu_grid_dim(void) const { return gpu_grid_dim_; }
+	int get_gpu_width(void) const { return gpu_width_; }
+	int get_gpu_height(void) const { return gpu_height_; }
+	size_t get_gpu_pitch(void) const { return gpu_pitch_; }
+
+	void CopyFromHostRaster(const Raster<T>& raster);
+	void Fill(T value);
+
 private:
 	T* gpu_array_;
 	dim3 gpu_block_dim_;
@@ -44,38 +54,49 @@ inline GpuRaster<T>::GpuRaster(std::string path, GDALAccess access) : Raster<T>(
 	gpu_height_ = gpu_block_dim_.y * gpu_grid_dim_.y + 2;
 
 	// Allocate the GPU array and set all of its elements to zero.
-	GpuErrChk(cudaMallocPitch((void**)&gpu_array_, &gpu_pitch_, gpu_width_*sizeof(T), gpu_height_));
-	GpuErrChk(cudaMemset2D(gpu_array_, gpu_pitch_, 0, gpu_width_*sizeof(T), gpu_height_));
-
-	// Copy data from the CPU to the GPU, beginning at coordinate (2, 2) on the GPU.
-	T* offset_array = (T*)((char*)Raster<T>::array_ + 0*gpu_pitch_) + 0;
-	GpuErrChk(cudaMemcpy2D(offset_array, gpu_pitch_, Raster<T>::array_, width*sizeof(T), width*sizeof(T), height, cudaMemcpyHostToDevice));
+	GpuErrChk(cudaMallocPitch((void**)&gpu_array_, &gpu_pitch_,
+	                          gpu_width_*sizeof(T), gpu_height_));
+	GpuRaster<T>::CopyFromHostRaster(*this);
 }
 
 template<class T>
-inline GpuRaster<T>::GpuRaster(const GpuRaster& raster, std::string path, GDALAccess access) {
-	// Construct the CPU-based raster object.
-	Raster<T>::Raster(raster, path, access);
-
+inline GpuRaster<T>::GpuRaster(const GpuRaster& raster, std::string path, GDALAccess access) : Raster<T>(raster, path, access) {
 	// Populate GPU-based raster metadata.
 	gpu_block_dim_ = raster.get_gpu_block_dim();
 	gpu_grid_dim_ = raster.get_gpu_grid_dim();
 	gpu_width_ = raster.get_gpu_width();
 	gpu_height_ = raster.get_gpu_height();
 
-	// Allocate the GPU array and set all of its elements to zero.
-	GpuErrChk(cudaMallocPitch((void**)&gpu_array_, &gpu_pitch_, gpu_width_*sizeof(T), gpu_height_));
-	GpuErrChk(cudaMemset2D(gpu_array_, gpu_pitch_, 0, gpu_width_*sizeof(T), gpu_height_));
+	// Allocate the new GPU array and perform a copy from the reference.
+	GpuErrChk(cudaMallocPitch((void**)&gpu_array_, &gpu_pitch_,
+	                          gpu_width_*sizeof(T), gpu_height_));
+	GpuErrChk(cudaMemcpy2D(gpu_array_, gpu_pitch_, raster.get_gpu_array(),
+	                       gpu_pitch_, gpu_width_ * sizeof(T), gpu_height_,
+                          cudaMemcpyDeviceToDevice));
+}
 
-	// Copy data from the CPU to the GPU, beginning at coordinate (2, 2) on the GPU.
-	T* offset_array = (T*)((char*)Raster<T>::array_ + 0*gpu_pitch_) + 0;
-	int width = Raster<T>::get_width();
-	int height = Raster<T>::get_height();
-	GpuErrChk(cudaMemcpy2D(offset_array, gpu_pitch_, Raster<T>::array_, width*sizeof(T), width*sizeof(T), height, cudaMemcpyHostToDevice));
+template<class T>
+inline void GpuRaster<T>::CopyFromHostRaster(const Raster<T>& raster) {
+	if (GpuRaster<T>::EqualDimensions(raster)) {
+		T* offset_gpu_array = (T*)((char*)gpu_array_);
+		GpuErrChk(cudaMemcpy2D(offset_gpu_array, gpu_pitch_, raster.get_array(),
+		                       raster.get_width()*sizeof(T),
+		                       raster.get_width()*sizeof(T),
+		                       raster.get_height(), cudaMemcpyHostToDevice));
+	} else {
+		std::string error_message = "Host/device raster dimension mismatch.";
+		std::cerr << "ERROR: " << error_message << std::endl;
+		std::exit(2);
+	}
+}
+
+template<class T>
+inline void GpuRaster<T>::Fill(T value) {
+	Raster<T>::Fill(value);
+	GpuRaster<T>::CopyFromHostRaster(*this);
 }
 
 template<class T>
 inline GpuRaster<T>::~GpuRaster(void) {
-	cudaFree(gpu_array_);
-	Raster<T>::~Raster();
+	GpuErrChk(cudaFree(gpu_array_));
 }

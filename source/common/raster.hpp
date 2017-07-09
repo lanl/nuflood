@@ -1,17 +1,21 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <cpl_conv.h>
 #include <gdal_priv.h>
+#include "error.h"
 
 template<class T>
 class Raster {
 public:
-	Raster(std::string path, GDALAccess access = GA_ReadOnly);
-	Raster(const Raster& raster, std::string path, GDALAccess access = GA_ReadOnly);
+	Raster(std::string path, GDALAccess access = GA_ReadOnly, std::string name = "");
+	Raster(const Raster& raster, std::string path, GDALAccess access = GA_ReadOnly, std::string name = "");
 	~Raster(void);
 
+	void Fill(T value);
 	void Update(void) const;
+	bool EqualDimensions(const Raster<T>& raster) const;
 
 	T* get_array(void) const { return array_; }
 	GDALDataset* get_dataset(void) const { return dataset_; }
@@ -22,10 +26,13 @@ public:
 protected:
 	T* array_;
 	GDALDataset* dataset_;
+	std::string name_;
 };
 
 template<class T>
-inline Raster<T>::Raster(std::string path, GDALAccess access) {
+inline Raster<T>::Raster(std::string path, GDALAccess access, std::string name) {
+	name_ = name;
+
 	GDALAllRegister();
 	dataset_ = (GDALDataset*)GDALOpen(path.c_str(), access);
 
@@ -35,12 +42,14 @@ inline Raster<T>::Raster(std::string path, GDALAccess access) {
 
 	GDALRasterBand* band = dataset_->GetRasterBand(1);
 	array_ = (T*)CPLMalloc(get_width()*get_height()*sizeof(T));
-	band->RasterIO(GF_Read, 0, 0, get_width(), get_height(), array_,
-		            get_width(), get_height(), GDT_Float32, 0, 0);
+
+	CPLErrChk(band->RasterIO(GF_Read, 0, 0, get_width(), get_height(), array_,
+                            get_width(), get_height(), GDT_Float32, 0, 0));
 }
 
 template<class T>
-inline Raster<T>::Raster(const Raster& raster, std::string path, GDALAccess access) {
+inline Raster<T>::Raster(const Raster& raster, std::string path, GDALAccess access, std::string name) {
+	name_ = name;
 	GDALDataset* src = raster.get_dataset();
 	GDALDriver* driver = src->GetDriver();
 	dataset_ = driver->CreateCopy(path.c_str(), src, false, NULL, NULL, NULL);
@@ -67,8 +76,23 @@ inline int Raster<T>::get_index(double x, double y) const {
 }
 
 template<class T>
+inline void Raster<T>::Fill(T value) {
+	std::fill_n(array_, get_width() * get_height(), value);
+}
+
+template<class T>
 inline void Raster<T>::Update(void) const {
 	GDALRasterBand* band = dataset_->GetRasterBand(1);
 	band->RasterIO(GF_Write, 0, 0, get_width(), get_height(), array_,
 		            get_width(), get_height(), GDT_Float32, 0, 0);
+}
+
+template<class T>
+inline bool Raster<T>::EqualDimensions(const Raster<T>& raster) const {
+	if (raster.get_width() == Raster<T>::get_width() &&
+		 raster.get_height() == Raster<T>::get_height()) {
+		return true;
+	} else {
+		return false;
+	}
 }
