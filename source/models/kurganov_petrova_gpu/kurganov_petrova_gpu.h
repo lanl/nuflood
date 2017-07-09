@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <rapidjson/document.h>
 #include <common/gpu_raster.hpp>
 

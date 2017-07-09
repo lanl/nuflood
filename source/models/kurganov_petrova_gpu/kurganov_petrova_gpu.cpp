@@ -1,7 +1,6 @@
 #include <limits>
 #include <memory>
 #include <common/document.h>
-#include <common/error.h>
 #include "kurganov_petrova_gpu.h"
 #include "compute_time_step.h"
 

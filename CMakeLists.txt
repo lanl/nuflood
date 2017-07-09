@@ -16,4 +16,10 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
 endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
 
 include_directories("libraries/rapidjson/include")
+
+option(NUFLOOD_BUILD_DOC "Build Nuflood documentation." ON)
+if(NUFLOOD_BUILD_DOC)
+	add_subdirectory(doc)
+endif()
+
 add_subdirectory(source)
