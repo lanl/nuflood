@@ -32,8 +32,8 @@ KurganovPetrovaGpu::KurganovPetrovaGpu(const rapidjson::Value& simulation) {
 		if (simulation["constants"].HasMember("desingularization")) {
 			desingularization_ = simulation["constants"]["desingularization"].GetDouble();
 		} else {
-			double dx = topographic_elevation_->get_cellsize_x();
-			double dy = topographic_elevation_->get_cellsize_y();
+			double dx = topographic_elevation_->cellsize_x();
+			double dy = topographic_elevation_->cellsize_y();
 			desingularization_ = sqrt(0.01*std::max(std::max(1.0, dx), dy));
 		}
 
@@ -56,7 +56,8 @@ void KurganovPetrovaGpu::Run(void) {
 	while (time_ <= end_time_) {
 		time_step_ = ComputeTimeStep(vertical_discharge_, desingularization_);
 		time_ += time_step_;
-	}	
+		std::cout << time_step_ << "\t" << time_ << std::endl;
+	}
 }
 
 int main(int argc, char* argv[]) {

@@ -8,19 +8,23 @@
 #define BLOCK_COLS 16
 #define BLOCK_ROWS 12
 
-template<class T>
+//! Default GpuRaster implementation.
+/*! Expands Raster functionality for graphics processing units (GPUs).
+    \tparam Type of raster data. Default is double.
+*/
+template<class T = double>
 class GpuRaster : public Raster<T> {
 public:
 	GpuRaster(std::string path, GDALAccess access = GA_ReadOnly);
 	GpuRaster(const GpuRaster& raster, std::string path, GDALAccess access = GA_ReadOnly);
 	~GpuRaster(void);
 
-	T* get_gpu_array(void) const { return gpu_array_; }
-	dim3 get_gpu_block_dim(void) const { return gpu_block_dim_; }
-	dim3 get_gpu_grid_dim(void) const { return gpu_grid_dim_; }
-	int get_gpu_width(void) const { return gpu_width_; }
-	int get_gpu_height(void) const { return gpu_height_; }
-	size_t get_gpu_pitch(void) const { return gpu_pitch_; }
+	T* gpu_array(void) const { return gpu_array_; }
+	dim3 gpu_block_dim(void) const { return gpu_block_dim_; }
+	dim3 gpu_grid_dim(void) const { return gpu_grid_dim_; }
+	int gpu_width(void) const { return gpu_width_; }
+	int gpu_height(void) const { return gpu_height_; }
+	size_t gpu_pitch(void) const { return gpu_pitch_; }
 
 	void CopyFromHostRaster(const Raster<T>& raster);
 	void Fill(T value);
@@ -37,11 +41,11 @@ private:
 template<class T>
 inline GpuRaster<T>::GpuRaster(std::string path, GDALAccess access) : Raster<T>(path, access) {
 	gpu_block_dim_.x = BLOCK_COLS;
-	int width = Raster<T>::get_width();
+	int width = Raster<T>::width();
 	gpu_grid_dim_.x = ((width + 1) + (gpu_block_dim_.x + 1)) / gpu_block_dim_.x;
 
 	gpu_block_dim_.y = BLOCK_ROWS;
-	int height = Raster<T>::get_height();
+	int height = Raster<T>::height();
 	gpu_grid_dim_.y = ((height + 1) + (gpu_block_dim_.y + 1)) / gpu_block_dim_.y;
 
 	// Adding two cells in each direction removes problems we could encounter at
@@ -62,15 +66,15 @@ inline GpuRaster<T>::GpuRaster(std::string path, GDALAccess access) : Raster<T>(
 template<class T>
 inline GpuRaster<T>::GpuRaster(const GpuRaster& raster, std::string path, GDALAccess access) : Raster<T>(raster, path, access) {
 	// Populate GPU-based raster metadata.
-	gpu_block_dim_ = raster.get_gpu_block_dim();
-	gpu_grid_dim_ = raster.get_gpu_grid_dim();
-	gpu_width_ = raster.get_gpu_width();
-	gpu_height_ = raster.get_gpu_height();
+	gpu_block_dim_ = raster.gpu_block_dim();
+	gpu_grid_dim_ = raster.gpu_grid_dim();
+	gpu_width_ = raster.gpu_width();
+	gpu_height_ = raster.gpu_height();
 
 	// Allocate the new GPU array and perform a copy from the reference.
 	GpuErrChk(cudaMallocPitch((void**)&gpu_array_, &gpu_pitch_,
 	                          gpu_width_*sizeof(T), gpu_height_));
-	GpuErrChk(cudaMemcpy2D(gpu_array_, gpu_pitch_, raster.get_gpu_array(),
+	GpuErrChk(cudaMemcpy2D(gpu_array_, gpu_pitch_, raster.gpu_array(),
 	                       gpu_pitch_, gpu_width_ * sizeof(T), gpu_height_,
                           cudaMemcpyDeviceToDevice));
 }
@@ -79,14 +83,14 @@ template<class T>
 inline void GpuRaster<T>::CopyFromHostRaster(const Raster<T>& raster) {
 	if (GpuRaster<T>::EqualDimensions(raster)) {
 		T* offset_gpu_array = (T*)((char*)gpu_array_);
-		GpuErrChk(cudaMemcpy2D(offset_gpu_array, gpu_pitch_, raster.get_array(),
-		                       raster.get_width()*sizeof(T),
-		                       raster.get_width()*sizeof(T),
-		                       raster.get_height(), cudaMemcpyHostToDevice));
+		GpuErrChk(cudaMemcpy2D(offset_gpu_array, gpu_pitch_, raster.array(),
+		                       raster.width()*sizeof(T),
+		                       raster.width()*sizeof(T),
+		                       raster.height(), cudaMemcpyHostToDevice));
 	} else {
 		std::string error_message = "Host/device raster dimension mismatch "
-		                            "between \"" + GpuRaster<T>::get_path() +
-		                            "\" and \"" + raster.get_path() + "\".";
+		                            "between \"" + GpuRaster<T>::path() +
+		                            "\" and \"" + raster.path() + "\".";
 		std::cerr << "ERROR: " << error_message << std::endl;
 		std::exit(2);
 	}
