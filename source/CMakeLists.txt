@@ -49,8 +49,7 @@ if(CUDA_FOUND)
 	IF(NOT(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Coverage"))
 		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11; -O3; -use_fast_math;
 									-ftz=true; -prec-div=false; -prec-sqrt=false;
-									-Xptxas -dlcm=ca; -lineinfo;
-									-Wno-deprecated-gpu-targets")
+									-Xptxas -dlcm=ca; -lineinfo; -Wno-deprecated-gpu-targets")
 	ELSE()
 		set(CUDA_NVCC_FLAGS "-std=c++11 -g -O0")
 	ENDIF()

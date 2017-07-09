@@ -53,7 +53,7 @@ inline GpuRaster<T>::GpuRaster(std::string path, GDALAccess access) : Raster<T>(
 	gpu_width_ = gpu_block_dim_.x * gpu_grid_dim_.x + 2;
 	gpu_height_ = gpu_block_dim_.y * gpu_grid_dim_.y + 2;
 
-	// Allocate the GPU array and set all of its elements to zero.
+	// Allocate memory for the GPU array and copy from the host array.
 	GpuErrChk(cudaMallocPitch((void**)&gpu_array_, &gpu_pitch_,
 	                          gpu_width_*sizeof(T), gpu_height_));
 	GpuRaster<T>::CopyFromHostRaster(*this);
@@ -84,7 +84,9 @@ inline void GpuRaster<T>::CopyFromHostRaster(const Raster<T>& raster) {
 		                       raster.get_width()*sizeof(T),
 		                       raster.get_height(), cudaMemcpyHostToDevice));
 	} else {
-		std::string error_message = "Host/device raster dimension mismatch.";
+		std::string error_message = "Host/device raster dimension mismatch "
+		                            "between \"" + GpuRaster<T>::get_path() +
+		                            "\" and \"" + raster.get_path() + "\".";
 		std::cerr << "ERROR: " << error_message << std::endl;
 		std::exit(2);
 	}
