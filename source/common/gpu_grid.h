@@ -1,9 +1,7 @@
 #pragma once
 
-#ifdef __CUDACC__
-
-#define BLOCK_COLS 16
 #define BLOCK_ROWS 12
+#define BLOCK_COLS 16
 
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -126,5 +124,3 @@ template<class T>
 inline bool GpuGrid<T>::IsEmpty(void) const {
 	return data_ == nullptr;
 }
-
-#endif

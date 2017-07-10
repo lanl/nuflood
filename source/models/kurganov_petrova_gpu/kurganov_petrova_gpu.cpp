@@ -3,9 +3,11 @@
 #include <common/document.h>
 #include "kurganov_petrova_gpu.h"
 #include "compute_time_step.h"
+#include "update_flux.h"
 
 KurganovPetrovaGpu::KurganovPetrovaGpu(const rapidjson::Value& simulation) {
 	topographic_elevation_ = new GpuRaster<double>(simulation["topography"].GetString());
+	topographic_elevation_interpolated_ = new GpuRaster<double>(*topographic_elevation_, "topographicElevationInterpolated.tif");
 	water_surface_elevation_ = new GpuRaster<double>(*topographic_elevation_, "waterSurfaceElevation.tif");
 
 	if (simulation.HasMember("horizontalDischarge")) {
@@ -54,6 +56,7 @@ KurganovPetrovaGpu::~KurganovPetrovaGpu(void) {
 
 void KurganovPetrovaGpu::Run(void) {
 	while (time_ <= end_time_) {
+		UpdateFlux(topographic_elevation_, water_surface_elevation_);
 		time_step_ = ComputeTimeStep(vertical_discharge_, desingularization_);
 		time_ += time_step_;
 		std::cout << time_step_ << "\t" << time_ << std::endl;

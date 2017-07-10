@@ -12,6 +12,7 @@ public:
 
 private:
 	GpuRaster<double>* topographic_elevation_;
+	GpuRaster<double>* topographic_elevation_interpolated_;
 	GpuRaster<double>* water_surface_elevation_;
 	GpuRaster<double>* horizontal_discharge_;
 	GpuRaster<double>* vertical_discharge_;

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cpl_conv.h>
 #include <gdal_priv.h>
+#include <gdalwarper.h>
+#include <ogr_spatialref.h>
 #include "error.h"
 
 //! Default Raster implementation.
@@ -19,6 +21,7 @@ public:
 
 	void Fill(T value);
 	void Update(void) const;
+	void Resample(void);
 	bool EqualDimensions(const Raster<T>& raster) const;
 
 	T* array(void) const { return array_; }
@@ -126,4 +129,37 @@ inline bool Raster<T>::EqualDimensions(const Raster<T>& raster) const {
 	} else {
 		return false;
 	}
+}
+
+template<class T>
+inline void Raster<T>::Resample(void) {
+	// Create output with same datatype as first input band.
+	GDALRasterBand* src_band = dataset_->GetRasterBand(1);
+	GDALDataType src_data_type = src_band->GetRasterDataType();
+	GDALDriver* src_driver = dataset_->GetDriver();
+
+	// Get Source coordinate system.
+	const char* src_wkt = dataset_->GetProjectionRef();
+
+	//// Get approximate output georeferenced bounds and resolution for file.
+	//double adfDstGeoTransform[6];
+	//int nPixels = 0, nLines = 0;
+	//CPLErr eErr;
+	//eErr = GDALSuggestedWarpOutput(*dataset_, GDALGenImgProjTransform, hTransformArg,
+	//                                adfDstGeoTransform, &nPixels, &nLines );
+	//CPLAssert(eErr == CE_None);
+	//GDALDestroyGenImgProjTransformer( hTransformArg );
+	//
+	//// Create the output file.
+	//hDstDS = GDALCreate(h_driver, "out.tif", nPixels, nLines, GDALGetRasterCount(*dataset_), eDT, NULL);
+	//CPLAssert(hDstDS != NULL);
+	//
+	//// Write out the projection definition.
+	//GDALSetProjection(hDstDS, pszDstWKT);
+	//GDALSetGeoTransform(hDstDS, adfDstGeoTransform);
+	//
+	//// Copy the color table, if required.
+	//GDALColorTableH hCT;
+	//hCT = GDALGetRasterColorTable(GDALGetRasterBand(*dataset_, 1));
+	//if (hCT != NULL) GDALSetRasterColorTable(GDALGetRasterBand(hDstDS,1), hCT);
 }

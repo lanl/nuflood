@@ -1,7 +1,7 @@
 set(SOURCE_FILES
-    compute_time_step.cu kurganov_petrova_gpu.cpp)
+    compute_time_step.cu kurganov_petrova_gpu.cpp update_flux.cu)
 set(HEADER_FILES
-    compute_time_step.h kurganov_petrova_gpu.h)
+    compute_time_step.h kurganov_petrova_gpu.h update_flux.h)
 
 cuda_add_library(KurganovPetrovaGpu STATIC ${SOURCE_FILES} ${HEADER_FILES})
 set(NAME "kurganov_petrova_gpu")
