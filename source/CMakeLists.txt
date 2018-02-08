@@ -1,4 +1,4 @@
-add_definitions(-DUSE_DOUBLE=1)
+add_definitions(-DUSE_DOUBLE=0)
 add_definitions(-DBIG_GRID=0)
 
 find_program (INTEL_COMPILER icc)
