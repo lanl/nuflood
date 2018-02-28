@@ -27,8 +27,8 @@ protected:
 	Topography topography;
 	Time time;
 	Output output;
-	Conserved conserved;
 	Constants constants;
+	Conserved conserved;
 	ISinks sinks;
 	Sources sources;
 	Infiltration infiltration;

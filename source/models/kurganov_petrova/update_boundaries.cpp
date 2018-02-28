@@ -97,29 +97,26 @@ inline void UpdateEastBoundaryOpen(const Constants& C, Conserved& U) {
 }
 
 inline void UpdateEastBoundaryWall(const Constants& C, const Topography& B, Conserved& U) {
-	//static prec_t*  w = U. w().data();
+	static prec_t* w = U.w().data();
 	static prec_t* hu = U.hu().data();
 	static prec_t* hv = U.hv().data();
-	//static prec_t* Bi = B.elevation_interpolated().data();
 
 	INT_TYPE j;
 	INT_TYPE num_columns = C.num_columns();
-	INT_TYPE num_rows    = C.num_rows();
+	INT_TYPE num_rows = C.num_rows();
 
 	#pragma omp parallel for private(j) shared(num_columns, num_rows, hu, hv)
 	for (j = 2; j < num_rows - 2; j++) {
-		INT_TYPE east    = j*num_columns + (num_columns-1);
+		INT_TYPE east = j*num_columns + (num_columns-1);
 		INT_TYPE east_m1 = j*num_columns + (num_columns-2);
 		INT_TYPE east_m2 = j*num_columns + (num_columns-3);
 		INT_TYPE east_m3 = j*num_columns + (num_columns-4);
 
-		// w[east] =   w[east_m2]; //Bi[east] + h_east_m3;
-		// w[east] =  Bi[east_m2];
+		w[east] = w[east_m2];
 		hu[east] = -hu[east_m2];
-		hv[east] =  hv[east_m2];
+		hv[east] = hv[east_m2];
 
-		// w[east_m1] =   w[east_m3];
-		// w[east_m1] =  Bi[east_m3];
+		w[east_m1] = w[east_m3];
 		hu[east_m1] = -hu[east_m3];
 		hv[east_m1] =  hv[east_m3];
 	}
@@ -217,34 +214,28 @@ inline void UpdateWestBoundaryOpen(const Constants& C, Conserved& U) {
 }
 
 inline void UpdateWestBoundaryWall(const Constants& C, const Topography& B, Conserved& U) {
-	//static prec_t*  w = U. w().data();
+	static prec_t* w = U.w().data();
 	static prec_t* hu = U.hu().data();
 	static prec_t* hv = U.hv().data();
-	//static prec_t* Bi = B.elevation_interpolated().data();
 
 	INT_TYPE j;
 	INT_TYPE num_columns = C.num_columns();
-	INT_TYPE num_rows    = C.num_rows();
+	INT_TYPE num_rows = C.num_rows();
 
 	#pragma omp parallel for private(j) shared(num_columns, num_rows, hu, hv)
 	for (j = 2; j < num_rows - 2; j++) {
-		INT_TYPE west    = j*num_columns + 0;
+		INT_TYPE west = j*num_columns + 0;
 		INT_TYPE west_p1 = j*num_columns + 1;
 		INT_TYPE west_p2 = j*num_columns + 2;
 		INT_TYPE west_p3 = j*num_columns + 3;
 
-		//prec_t h_west    = w[west   ] - Bi[west   ];
-		//prec_t h_west_p1 = w[west_p1] - Bi[west_p1];
-		//prec_t h_west_p2 = w[west_p2] - Bi[west_p2];
-		//prec_t h_west_p3 = w[west_p3] - Bi[west_p3];
-
-		//w [west] =  Bi[west] + h_west_p3;
+		w[west] = w[west_p2];
 		hu[west] = -hu[west_p2];
-		hv[west] =  hv[west_p2];
+		hv[west] = hv[west_p2];
 
-		//w [west_p1] =  Bi[west_p1] + h_west_p2;
+		w[west_p1] = w[west_p3];
 		hu[west_p1] = -hu[west_p3];
-		hv[west_p1] =  hv[west_p3];
+		hv[west_p1] = hv[west_p3];
 	}
 }
 
@@ -340,33 +331,27 @@ inline void UpdateNorthBoundaryOpen(const Constants& C, Conserved& U) {
 }
 
 inline void UpdateNorthBoundaryWall(const Constants& C, const Topography& B, Conserved& U) {
-	//static prec_t*  w = U. w().data();
+	static prec_t* w = U.w().data();
 	static prec_t* hu = U.hu().data();
 	static prec_t* hv = U.hv().data();
-	//static prec_t* Bi = B.elevation_interpolated().data();
 
 	INT_TYPE i;
 	INT_TYPE num_columns = C.num_columns();
-	INT_TYPE num_rows    = C.num_rows();
+	INT_TYPE num_rows = C.num_rows();
 
 	#pragma omp parallel for private(i) shared(num_columns, num_rows, hu, hv)
 	for (i = 2; i < num_columns - 2; i++) {
-		INT_TYPE north    = (num_rows-1)*num_columns + i;
+		INT_TYPE north = (num_rows-1)*num_columns + i;
 		INT_TYPE north_m1 = (num_rows-2)*num_columns + i;
 		INT_TYPE north_m2 = (num_rows-3)*num_columns + i;
 		INT_TYPE north_m3 = (num_rows-4)*num_columns + i;
 
-		//prec_t h_north    = w[north   ] - Bi[north   ];
-		//prec_t h_north_m1 = w[north_m1] - Bi[north_m1];
-		//prec_t h_north_m2 = w[north_m2] - Bi[north_m2];
-		//prec_t h_north_m3 = w[north_m3] - Bi[north_m3];
-	
-		//w [north] =  Bi[north] + h_north_m3;
-		hu[north] =  hu[north_m2];
+		w[north] = w[north_m2];
+		hu[north] = hu[north_m2];
 		hv[north] = -hv[north_m2];
 
-		//w [north_m1] =  Bi[north_m1] + h_north_m2;
-		hu[north_m1] =  hu[north_m3];
+		w[north_m1] = w[north_m3];
+		hu[north_m1] = hu[north_m3];
 		hv[north_m1] = -hv[north_m3];
 	}
 }
@@ -462,32 +447,26 @@ inline void UpdateSouthBoundaryOpen(const Constants& C, Conserved& U) {
 }
 
 inline void UpdateSouthBoundaryWall(const Constants& C, const Topography& B, Conserved& U) {
-	//static prec_t*  w = U. w().data();
+	static prec_t* w = U.w().data();
 	static prec_t* hu = U.hu().data();
 	static prec_t* hv = U.hv().data();
-	//static prec_t* Bi = B.elevation_interpolated().data();
 
 	INT_TYPE i;
 	INT_TYPE num_columns = C.num_columns();
 
 	#pragma omp parallel for private(i) shared(num_columns, hu, hv)
 	for (i = 2; i < num_columns - 2; i++) {
-		INT_TYPE south    = 0*num_columns + i;
+		INT_TYPE south = 0*num_columns + i;
 		INT_TYPE south_p1 = 1*num_columns + i;
 		INT_TYPE south_p2 = 2*num_columns + i;
 		INT_TYPE south_p3 = 3*num_columns + i;
 
-		//prec_t h_south    = w[south   ] - Bi[south   ];
-		//prec_t h_south_p1 = w[south_p1] - Bi[south_p1];
-		//prec_t h_south_p2 = w[south_p2] - Bi[south_p2];
-		//prec_t h_south_p3 = w[south_p3] - Bi[south_p3];
-	
-		//w [south] =  Bi[south] + h_south_p3;
-		hu[south] =  hu[south_p2];
+		w[south] = w[south_p2];
+		hu[south] = hu[south_p2];
 		hv[south] = -hv[south_p2];
 
-		//w [south_p1] =  Bi[south_p1] + h_south_p2;
-		hu[south_p1] =  hu[south_p3];
+		w[south_p1] = w[south_p3];
+		hu[south_p1] = hu[south_p3];
 		hv[south_p1] = -hv[south_p3];
 	}
 }
