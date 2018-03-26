@@ -39,6 +39,11 @@ void KurganovPetrova::Step(void) {
 void KurganovPetrova::Run(void) {
 	timer.Reset();
 
+	// Print initial data.
+	conserved.WriteGrids(output, time.current());
+	output.PrintInformation(time, conserved, topography, constants, infiltration);
+	output.IncrementTime();
+
 	while (time.current() < time.end() &&
 	       time.iteration() < time.max_iterations()) {
 		Step();
