@@ -26,6 +26,18 @@ Conserved::Conserved(const rapidjson::Value& root, const Topography& topography,
 		w_.Add(-topography.minimum());
 		w_.BilinearInterpolate();
 		w_.AddBoundaries();
+
+		// Ensure there will be no cells with negative depth.
+		#pragma omp parallel for
+		for (INT_TYPE row = 0; row < w_.num_rows(); row++) {
+			for (INT_TYPE column = 0; column < w_.num_columns(); column++) {
+				prec_t B_ij = topography.elevation_interpolated().Get(column, row);
+				prec_t w_ij = w_.Get(column, row);
+				if (B_ij > w_ij) {
+					w_.Set(B_ij, column, row);
+				}
+			}
+		}
 	} else {
 		w_.Copy(topography.elevation_interpolated());
 	}
