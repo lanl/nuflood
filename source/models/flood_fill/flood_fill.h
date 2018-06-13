@@ -12,6 +12,8 @@ public:
 private:
 	void Grow(void);
 	void UpdateWetCells(void);
+	void FillCorner(INT_TYPE column, INT_TYPE row);
+	void FillCorners(void);
 
 	Folder output_folder_;
 	INT_TYPE num_seeds_, num_wet_;
