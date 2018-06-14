@@ -224,7 +224,28 @@ void FloodFill::Run(void) {
 	}
 
 	FillCorners();
+	//ReduceEdges();
 	h_.Write(output_folder_);
+}
+
+void FloodFill::ReduceEdges(void) {
+	Grid<float> h_tmp;
+	h_tmp.Copy(h_);
+
+	#pragma omp parallel for
+	for (INT_TYPE j = 0; j < B_.num_rows(); j++) {
+		for (INT_TYPE i = 0; i < B_.num_columns(); i++) {
+			bool left_dry = i == 0 ? false : h_tmp.Get(i - 1, j) <= 0.0;
+			bool right_dry = i == B_.num_columns() - 1 ? false : h_tmp.Get(i + 1, j) <= 0.0;
+			bool top_dry = j == B_.num_rows() - 1 ? false : h_tmp.Get(i, j + 1) <= 0.0;
+			bool bottom_dry = j == 0 ? false : h_tmp.Get(i, j - 1) <= 0.0;
+			bool any_dry = left_dry || right_dry || top_dry || bottom_dry;
+
+			if (any_dry) {
+				h_.Set(0.0f, i, j);
+			}
+		}
+	}
 }
 
 int main(int argc, char* argv[]) {
