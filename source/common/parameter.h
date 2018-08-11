@@ -23,7 +23,7 @@ inline void ReadParameter(const rapidjson::Value& root,
 
 inline void ReadParameter(const rapidjson::Value& root, const std::string name, double& value) {
 	if (root.HasMember(name.c_str())) {
-		if (root[name.c_str()].IsDouble()) {
+		if (root[name.c_str()].IsNumber()) {
 			value = root[name.c_str()].GetDouble();
 		} else {
 			PrintErrorAndExit("Value '" + name + "' is not a valid double.");
@@ -33,7 +33,7 @@ inline void ReadParameter(const rapidjson::Value& root, const std::string name, 
 
 inline void ReadParameter(const rapidjson::Value& root, const std::string name, float& value) {
 	if (root.HasMember(name.c_str())) {
-		if (root[name.c_str()].IsDouble()) {
+		if (root[name.c_str()].IsNumber()) {
 			value = (float)(root[name.c_str()].GetDouble());
 		} else {
 			PrintErrorAndExit("Value '" + name + "' is not a valid float.");
@@ -125,14 +125,14 @@ inline void ReadParameter(const rapidjson::Value& root, const std::string array_
 			unsigned int i = 0;
 			while (i < point_array_json.Size()) {
 				double x = 0.0, y = 0.0;
-				if (point_array_json[i].IsDouble()) {
+				if (point_array_json[i].IsNumber()) {
 					x = point_array_json[i].GetDouble();
 					i += 1;
 				} else {
 					PrintErrorAndExit("Point source x-coordinate is not a valid double.");
 				}
 
-				if (point_array_json[i].IsDouble()) {
+				if (point_array_json[i].IsNumber()) {
 					y = point_array_json[i].GetDouble();
 					i += 1;
 				} else {

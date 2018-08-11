@@ -31,6 +31,13 @@ mkdir build && cd build
 cmake .. && make
 ```
 
+To compile on Mac OSX, ensure non-Clang `gcc` and `g++` compilers are installed, then run
+```bash
+mkdir build && cd build
+cmake -DCMAKE_C_COMPILER=/path/to/gcc -DCMAKE_CXX_COMPILER=/path/to/g++ ..
+make
+```
+
 ## Build and run the Docker image
 
 ```bash

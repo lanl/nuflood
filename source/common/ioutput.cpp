@@ -60,13 +60,13 @@ bool IOutput::GridInList(const Grid<prec_t>& grid) const {
 
 void IOutput::WriteGridIfInList(const prec_t current_time, const Grid<prec_t>& grid) const {
 	if (grid_list_.Contains(grid.name())) {
-		grid.Write(folder_, current_time);
+		grid.WriteWithoutBoundaries(folder_, current_time);
 	}
 }
 
 void IOutput::WriteGridIfInList(const Grid<prec_t>& grid) const {
 	if (grid_list_.Contains(grid.name())) {
-		grid.Write(folder_);
+		grid.WriteWithoutBoundaries(folder_);
 	}
 }
 

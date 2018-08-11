@@ -6,8 +6,8 @@
 
 KurganovPetrova::KurganovPetrova(const rapidjson::Value& root) :
   topography(root), time(root, topography.elevation_interpolated()),
-  output(root, time), conserved(root, topography, constants, output),
-  constants(root, topography), sinks(root, constants),
+  output(root, time), constants(root, topography),
+  conserved(root, topography, constants, output), sinks(root, constants),
   sources(root, topography, constants),
   infiltration(root, topography), time_derivative(root, topography),
   boundary_conditions(root), friction(root),
@@ -38,6 +38,11 @@ void KurganovPetrova::Step(void) {
 
 void KurganovPetrova::Run(void) {
 	timer.Reset();
+
+	// Print initial data.
+	conserved.WriteGrids(output, time.current());
+	output.PrintInformation(time, conserved, topography, constants, infiltration);
+	output.IncrementTime();
 
 	while (time.current() < time.end() &&
 	       time.iteration() < time.max_iterations()) {

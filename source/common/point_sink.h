@@ -10,7 +10,7 @@
 template<class T>
 class PointSink {
 public:
-	PointSink(void) : x_(0.0), y_(0.0), rate_((T)(0)), depth_((T)(0), name_("")) {}
+	PointSink(void) : x_(0.0), y_(0.0), rate_((T)(0)), depth_((T)(0), name_) {}
 	PointSink(const double x, const double y, const T rate,
 	          const T depth = (T)0, const std::string name = "");
 

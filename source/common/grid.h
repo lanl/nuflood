@@ -60,8 +60,8 @@ public:
 	bool IsEmpty(void) const;
 
 	// Set operations.
-	void Set(const T value, const INT_TYPE column,
-	         const INT_TYPE row);
+	void Set(const T value, const INT_TYPE column, const INT_TYPE row);
+	void Set(const T value, const double x, const double y);
 	void set_name(const std::string name) { name_ = name; }
 
 	// Get operations.
@@ -225,6 +225,12 @@ inline void Grid<T>::Set(const T value, const INT_TYPE column,
 	// this function may result in performance degradation (compared to operating
 	// on data_ itself).
 	INT_TYPE linear_index = GetLinearIndex(column, row);
+	data_[linear_index] = value;
+}
+
+template<class T>
+inline void Grid<T>::Set(const T value, const double x, const double y) {
+	INT_TYPE linear_index = GetLinearIndex(x, y);
 	data_[linear_index] = value;
 }
 
