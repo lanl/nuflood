@@ -11,7 +11,7 @@ class ISinks {
 public:
 	ISinks(const rapidjson::Value& root, const IConstants& constants);
 	std::vector< PointSink<prec_t> >& points(void) { return points_; }
-	const unsigned int num_points(void) const { return points_.size(); }
+	unsigned int num_points(void) const { return points_.size(); }
 
 protected:
 	std::vector< PointSink<prec_t> > points_;

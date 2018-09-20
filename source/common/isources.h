@@ -15,11 +15,11 @@ public:
 	void Update(const ITime& T);
 
 	const std::vector< PointSource<prec_t> >& points(void) const { return points_; }
-	const unsigned int num_points(void) const { return points_.size(); }
+	unsigned int num_points(void) const { return points_.size(); }
 	const Grid<prec_t>& rainfall_grid(void) const { return rainfall_grid_; }
 	const TimeSeries<prec_t>& storm_curve(void) const { return storm_curve_; }
 	const TimeSeries<prec_t>& marigram(void) const { return marigram_; }
-	const prec_t storm_curve_proportion(void) const { return storm_curve_proportion_; }
+	prec_t storm_curve_proportion(void) const { return storm_curve_proportion_; }
 
 protected:
 	std::vector< PointSource<prec_t> > points_;
