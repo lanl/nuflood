@@ -1,3 +1,5 @@
+#ifdef __CUDACC__
+
 #include "error.h"
 #include "gpu_error.h"
 
@@ -8,3 +10,5 @@ void GpuAssert(cudaError_t code, std::string file, int line) {
 		PrintErrorAndExit(error_string);
 	}
 }
+
+#endif

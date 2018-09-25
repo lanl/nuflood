@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef __CUDACC__
+
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include "gpu_error.h"
@@ -106,3 +108,5 @@ template<class T>
 inline GpuRaster<T>::~GpuRaster(void) {
 	GpuErrChk(cudaFree(gpu_array_));
 }
+
+#endif
