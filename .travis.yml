@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 
 sudo: required
 
@@ -10,8 +10,11 @@ compiler:
 addons:
   apt:
     packages:
-    - cmake
-    - lcov
+      - cmake
+      - lcov
+  artifacts:
+    s3_region: ${AWS_REGION}
+    paths: "./build/doc/html"
 
 git:
   submodules: false
