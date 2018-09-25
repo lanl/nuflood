@@ -12,6 +12,9 @@ branches:
 compiler:
   - gcc
 
+deploy:
+   skip_cleanup: true
+
 addons:
   apt:
     packages:
