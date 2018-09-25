@@ -20,7 +20,8 @@ addons:
       - libgdal-dev
   artifacts:
     s3_region: ${AWS_REGION}
-    paths: "./build/doc/html"
+    paths: ${HOME}/build/lanl/nuflood/build/doc/html
+    debug: true
 
 git:
   submodules: false
@@ -33,7 +34,6 @@ script:
   - mkdir build && cd build
   - cmake -DCMAKE_BUILD_TYPE=Coverage ..
   - make
-  - make nuflood_coverage
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
