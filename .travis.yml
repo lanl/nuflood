@@ -19,6 +19,7 @@ addons:
   apt:
     packages:
       - cmake
+      - doxygen
       - lcov
       - libgdal-dev
   artifacts:
