@@ -1,24 +1,22 @@
 #pragma once
 
-#include <common/grid.h>
-#include <common/document.h>
 #include <common/index_table.h>
+#include <common/raster.hpp>
+#include "input.hpp"
 
 class FloodFill {
 public:
-	FloodFill(const rapidjson::Value& root);
+	FloodFill(const Input& input);
 	void Run(void);
 
 private:
 	void Grow(void);
 	void UpdateWetCells(void);
-	void FillCorner(INT_TYPE column, INT_TYPE row);
-	void FillCorners(void);
-	void ReduceEdges(void);
+	void WriteResults(void);
 
-	Folder output_folder_;
-	INT_TYPE num_seeds_, num_wet_;
+	const Input* input_;
 	INT_TYPE num_iterations_;
-	Grid<float> B_, w_, h_;
+	INT_TYPE num_seeds_, num_wet_;
+	Raster<prec_t> B_, w_, h_;
 	IndexTable wet_, seed_, seed_holder_;
 };

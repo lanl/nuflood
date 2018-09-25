@@ -1,90 +1,57 @@
 #include <omp.h>
 #include <iostream>
-#include <common/parameter.h>
 #include <common/index_table.h>
-#include <common/file.h>
 #include "flood_fill.h"
+#include "input.hpp"
 
-FloodFill::FloodFill(const rapidjson::Value& root) {
-	File depth_file_;
-	File bathymetry_file_;
-	File water_surface_elevation_file_;
-	float added_depth = 0.0f;
-	output_folder_.Clear();
+FloodFill::FloodFill(const Input& input) {
+	input_ = &input;
+	num_seeds_ = num_wet_ = num_iterations_ = 0;
+	B_.Read(input.elevation_path());
 
-	ReadParameter(root, "depthFile", depth_file_);
-	ReadParameter(root, "bathymetryFile", bathymetry_file_);
-	ReadParameter(root, "waterSurfaceElevationFile", water_surface_elevation_file_);
-	ReadParameter(root, "outputFolder", output_folder_);
-	ReadParameter(root, "addedDepth", added_depth); // added depth (meters)
-
-	B_.Load(bathymetry_file_);
-	B_.set_name("bathymetry");
-
-	if (!water_surface_elevation_file_.IsEmpty()) {
-		w_.Load(water_surface_elevation_file_);
-	} else {
-		w_.Copy(B_);
-	}
-
-	w_.set_name("waterSurfaceElevation");
-
-	if (root.HasMember("seeds")) {
-		const rapidjson::Value& point_array_json = root["seeds"];
-
-		unsigned int i = 0;
-		while (i < point_array_json.Size()) {
-			double x = point_array_json[i++].GetDouble();
-			double y = point_array_json[i++].GetDouble();
-			double z = point_array_json[i++].GetDouble();
-			w_.Set(z, x, y);
-		}
-	}
-
-	if (!depth_file_.IsEmpty()) {
-		h_.Load(depth_file_);
+	if (!input.depth_path().empty()) {
+		h_.Read(input.depth_path());
+		w_.CopyFrom(B_);
 		w_.Add(h_);
+	} else if (!input.wse_path().empty()) {
+		w_.Read(input.wse_path());
+		h_.CopyFrom(w_);
+		h_.Subtract(B_);
 	} else {
-		h_.Copy(B_);
-		h_.Fill(0.0f);
+		w_.CopyFrom(B_);
+		h_.CopyFrom(B_);
+		h_.Fill((prec_t)0);
 	}
 
-	h_.set_name("depth");
-
-	if (!w_.DimensionsMatch(B_) || !h_.DimensionsMatch(B_)) {
-		PrintErrorAndExit("Input grid files do not have matching dimensions.");
+	for (auto it : input.point_sources_depth()) {
+		INT_TYPE ij = h_.index(it.x, it.y);
+		prec_t h_value = it.value > (prec_t)0 ? it.value : (prec_t)0;
+		h_.SetAtIndex(ij, h_value);
+		w_.SetAtIndex(ij, B_.GetFromIndex(ij) + h_value);
 	}
 
-	num_iterations_ = 0;
-	num_seeds_ = 0;
-	num_wet_ = 0;
+	for (auto it : input.point_sources_wse()) {
+		INT_TYPE ij = w_.index(it.x, it.y);
+		prec_t w_value = it.value > B_.GetFromIndex(ij) ? it.value : B_.GetFromIndex(ij);
+		w_.SetAtIndex(ij, w_value);
+		h_.SetAtIndex(ij, w_value - B_.GetFromIndex(ij));
+	}
 
 	#pragma omp parallel for
-	for (INT_TYPE j = 0; j < B_.num_rows(); j++) {
-		for (INT_TYPE i = 0; i < B_.num_columns(); i++) {
-			float wse = w_.Get(i, j);
-
-			bool skip = false;
-			if (wse == w_.nodata_value() || B_.Get(i, j) == B_.nodata_value()) {
-				skip = true;
-			}
-
-			h_.Set(wse - B_.Get(i, j), i, j);
-
-			if (h_.Get(i, j) > 0.0f && !skip) {
-				if (added_depth > 0.0f) {
-					h_.Set(added_depth + wse - B_.Get(i, j), i, j);
-					w_.Set(added_depth + wse, i, j);
-				}
-
-				#pragma omp critical
-				{
-					num_seeds_ += seed_.Insert(i, j) ? 1 : 0;
-					num_wet_ += wet_.Insert(i, j) ? 1 : 0;
-				}
-			} else {
-				h_.Set(0.0f, i, j);
-				w_.Set(B_.Get(i, j), i, j);
+	for (INT_TYPE ij = 0; ij < B_.num_pixels(); ij++) {
+		if (B_.GetFromIndex(ij) == B_.nodata()) {
+			w_.SetAtIndex(ij, w_.nodata());
+			h_.SetAtIndex(ij, h_.nodata());
+		} else if (w_.GetFromIndex(ij) == w_.nodata()) {
+			w_.SetAtIndex(ij, B_.GetFromIndex(ij));
+			h_.SetAtIndex(ij, 0.0);
+		} else if (h_.GetFromIndex(ij) > 0.0) {
+			#pragma omp critical
+			{
+				INT_TYPE i = ij / B_.width();
+				INT_TYPE j = ij % B_.width();
+				num_seeds_ += (INT_TYPE)seed_.Insert(i, j);
+				num_wet_ += (INT_TYPE)wet_.Insert(i, j);
 			}
 		}
 	}
@@ -96,55 +63,29 @@ void FloodFill::Grow(void) {
 	#pragma omp parallel
 	#pragma omp single
 	{
-		for (Map::const_iterator it = seed_.begin(); it != seed_.end(); ++it) {
+		for (auto it : seed_) {
 			#pragma omp task firstprivate(it)
-			for (const INT_TYPE& column: it->second) {
-				const INT_TYPE row = it->first;
-				bool out_of_bounds = row == 0 || row == B_.num_rows()-1 ||
-				                     column == 0 || column == B_.num_columns()-1;
-				if (out_of_bounds) {
-					continue;
-				}
+			for (const INT_TYPE& i : it.second) {
+				const INT_TYPE j = it.first;
+				prec_t w_ij = w_.GetFromIndices(i, j);
+				if (w_ij == w_.nodata()) continue;
 
-				if (w_.Get(column, row) == w_.nodata_value()) {
-					continue;
-				}
+				for (INT_TYPE k = 0; k < 4; k++) {
+					INT_TYPE ii = i + k % 2 - k / 2;
+					INT_TYPE jj = j + (k + 1) % 2 - (k + 1)  / 3;
+					if (ii < 0 || ii > B_.height() - 1 || jj < 0 || jj > B_.width() - 1) continue;
 
-				float wij = w_.Get(column, row);
-				INT_TYPE i, j;
-				for (INT_TYPE m = 0; m < 4; m++) {
-					switch(m) {
-						case 0:
-							i = column + 1;
-							j = row;
-							break;
-						case 1:
-							i = column - 1;
-							j = row;
-							break;
-						case 2:
-							i = column;
-							j = row + 1;
-							break;
-						case 3:
-							i = column;
-							j = row - 1;
-							break;
-					}
+					prec_t B_ij = B_.GetFromIndices(ii, jj);
+					if (B_ij == B_.nodata()) continue;
 
-					if (B_.Get(i, j) == B_.nodata_value()) {
-						continue;
-					}
+					prec_t h_ij = w_ij - B_ij;
 
-					float Bij = B_.Get(i, j);
-					float hij = wij - Bij;
-
-					if (hij > 0.0f && !wet_.Contains(i, j)) {
+					if (h_ij > 0.0 && !wet_.Contains(ii, jj)) {
 						#pragma omp critical
 						{
-							seed_holder_.Insert(i, j);
-							w_.Set(wij, i, j);
-							h_.Set(hij, i, j);
+							seed_holder_.Insert(ii, jj);
+							w_.SetAtIndices(ii, jj, w_ij);
+							h_.SetAtIndices(ii, jj, h_ij);
 						}
 					}
 				}
@@ -159,93 +100,28 @@ void FloodFill::UpdateWetCells(void) {
 	seed_.Clear();
 	num_seeds_ = 0;
 
-	for (Map::const_iterator it = seed_holder_.begin(); it != seed_holder_.end(); ++it) {
-		INT_TYPE row = it->first;
-		for (const INT_TYPE& column: it->second) {
-			num_seeds_ += seed_.Insert(column, row) ? 1 : 0;
-			num_wet_ += wet_.Insert(column, row) ? 1 : 0;
+	for (auto it : seed_holder_) {
+		INT_TYPE j = it.first;
+		for (const INT_TYPE& i : it.second) {
+			num_seeds_ += (INT_TYPE)seed_.Insert(i, j);
+			num_wet_ += (INT_TYPE)wet_.Insert(i, j);
 		}
 	}
 }
 
-void FloodFill::FillCorner(INT_TYPE column, INT_TYPE row) {
-	INT_TYPE i, j;
-	for (INT_TYPE m = 0; m < 4; m++) {
-		switch(m) {
-			case 0:
-				i = column + 1;
-				j = row;
-				break;
-			case 1:
-				i = column - 1;
-				j = row;
-				break;
-			case 2:
-				i = column;
-				j = row + 1;
-				break;
-			case 3:
-				i = column;
-				j = row - 1;
-				break;
-		}
-
-		if (i < 0 || i > B_.num_columns() - 1 || 
-		    j < 0 || j > B_.num_rows() - 1 ||
-			 B_.Get(i, j) == B_.nodata_value() ||
-			 h_.Get(i, j) <= 0.0) {
-			continue;
-		}
-
-		if (h_.Get(i, j) > 0.0) {
-			float h_new = w_.Get(i, j) - B_.Get(column, row);
-			h_.Set(h_new, column, row);
-			break;
-		}
-	}
-}
-
-void FloodFill::FillCorners(void) {
-	FillCorner(0, 0);
-	FillCorner(0, B_.num_rows() - 1);
-	FillCorner(B_.num_columns() - 1, 0);
-	FillCorner(B_.num_columns() - 1, B_.num_rows() - 1);
+void FloodFill::WriteResults(void) {
+	if (!input_->output_depth_path().empty()) h_.Write(input_->output_depth_path());
+	if (!input_->output_wse_path().empty()) w_.Write(input_->output_wse_path());
 }
 
 void FloodFill::Run(void) {
-	std::cout << "Iteration" << "\t" << "Number of seeds" << std::endl;
-	std::cout << num_iterations_ << "\t" << num_seeds_ << std::endl;
-
 	while (num_seeds_ > 0) {
-		Grow();
-		UpdateWetCells();
+		FloodFill::Grow();
+		FloodFill::UpdateWetCells();
 		num_iterations_++;
-		std::cout << num_iterations_ << "\t" << num_seeds_ << std::endl;
 	}
 
-	FillCorners();
-	//ReduceEdges();
-	h_.Write(output_folder_);
-}
-
-void FloodFill::ReduceEdges(void) {
-	Grid<float> h_tmp;
-	h_tmp.Copy(h_);
-
-	#pragma omp parallel for
-	for (INT_TYPE j = 0; j < B_.num_rows(); j++) {
-		for (INT_TYPE i = 0; i < B_.num_columns(); i++) {
-			bool left_dry = i == 0 ? false : h_tmp.Get(i - 1, j) <= 0.0;
-			bool right_dry = i == B_.num_columns() - 1 ? false : h_tmp.Get(i + 1, j) <= 0.0;
-			bool top_dry = j == B_.num_rows() - 1 ? false : h_tmp.Get(i, j + 1) <= 0.0;
-			bool bottom_dry = j == 0 ? false : h_tmp.Get(i, j - 1) <= 0.0;
-			bool any_dry = left_dry || right_dry || top_dry || bottom_dry;
-
-			if (any_dry) {
-				h_.Set(0.0f, i, j);
-			}
-		}
-	}
+	FloodFill::WriteResults();
 }
 
 int main(int argc, char* argv[]) {
@@ -254,17 +130,14 @@ int main(int argc, char* argv[]) {
 		PrintErrorAndExit("Scenario file has not been specified.");
 	}
 
-	// Read the scenario file.
-	File scenario(argv[1]);
-
-	// Parse the scenario file as a JSON document.
-	Document json(scenario);
+	// Read in the input.
+	Input input(argv[1]);
 
 	// Set up the model.
-	FloodFill model(json.root["parameters"]);
+	FloodFill flood_fill(input);
 
 	// Run the model.
-	model.Run();
+	flood_fill.Run();
 
 	// Program executed successfully.
 	return 0;

@@ -18,16 +18,15 @@ IConstants::IConstants(const rapidjson::Value& root, const ITopography& topograp
 	}
 
 	if (topography.metric()) {
-		cellsize_x_ = (prec_t)topography.elevation().cellsize();
-		cellsize_y_ = (prec_t)topography.elevation().cellsize();
+		cellsize_x_ = (prec_t)topography.elevation().cellsize_x();
+		cellsize_y_ = (prec_t)topography.elevation().cellsize_y();
 	} else {
-		cellsize_x_ = (prec_t)topography.elevation().cellsize() * 6378137.0*3.1415927 / 180.0;
-		cellsize_y_ = (prec_t)topography.elevation().cellsize() * 6378137.0*3.1415927 / 180.0;
+		cellsize_x_ = (prec_t)topography.elevation().cellsize_x() * 6378137.0*3.1415927 / 180.0;
+		cellsize_y_ = (prec_t)topography.elevation().cellsize_y() * 6378137.0*3.1415927 / 180.0;
 	}
 
 	cell_area_ = cellsize_x_ * cellsize_y_;
-	num_columns_ = topography.elevation().num_columns();
-	num_rows_ = topography.elevation().num_rows();
-	num_cells_ = (unsigned long)topography.elevation().num_columns() *
-	             (unsigned long)topography.elevation().num_rows();
+	num_columns_ = topography.elevation().width();
+	num_rows_ = topography.elevation().height();
+	num_cells_ = (unsigned long)num_columns_ * (unsigned long)num_rows_;
 }

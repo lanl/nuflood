@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
 	KurganovPetrova model(json.root["parameters"]);
 
 	// Run the model.
-	model.Run();
+	//model.Run();
 
 	// Program executed successfully.
 	return 0;

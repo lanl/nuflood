@@ -1,7 +1,7 @@
 add_definitions(-DUSE_DOUBLE=1)
 add_definitions(-DBIG_GRID=0)
 
-find_program (INTEL_COMPILER icc)
+find_program(INTEL_COMPILER icc)
 
 if(INTEL_COMPILER)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11; -O3; -parallel; -openmp;

@@ -8,26 +8,28 @@ ITopography::ITopography(const rapidjson::Value& root) {
 	if (root.HasMember("topography")) {
 		const rapidjson::Value& json = root["topography"];
 
-		ReadParameter(json, "metric", metric_);
-
 		if (json.HasMember("elevationFile")) {
-			elevation_.Load(File(json["elevationFile"].GetString()));
+			std::string elevation_path = json["elevationFile"].GetString();
+			elevation_.Read(elevation_path);
+			elevation_.set_name("topographicElevation");
+			ReadParameter(json, "metric", metric_);
 		} else {
-			elevation_.Initialize(256, 256, 0.0, 0.0, 1.0);
+			std::string error_message = "Path to topographic elevation not specified.";
+			std::cerr << "ERROR: " << error_message << std::endl;
+			std::exit(1);
 		}
 	} else {
-		elevation_.Initialize(256, 256, 0.0, 0.0, 1.0);
+		std::string error_message = "Topography parameters not specified.";
+		std::cerr << "ERROR: " << error_message << std::endl;
+		std::exit(1);
 	}
-
-
-	elevation_.set_name("topographicElevation");
 }
 
 void ITopography::WriteGrids(const IOutput& output) const {
 	static bool printed = false;
 
 	if (!printed) {
-		output.WriteGridIfInList(elevation_);
+		//output.WriteGridIfInList(elevation_);
 		printed = true;
 	}
 }
