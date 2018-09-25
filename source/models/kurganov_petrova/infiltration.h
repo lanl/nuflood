@@ -15,9 +15,9 @@ public:
 	const Grid<prec_t>& psi_grid(void) const { return psi_grid_; }
 	const Grid<prec_t>& dtheta_grid(void) const { return dtheta_grid_; }
 
-	const prec_t K_value(void) const { return K_value_; }
-	const prec_t psi_value(void) const { return psi_value_; }
-	const prec_t dtheta_value(void) const { return dtheta_value_; }
+	prec_t K_value(void) const { return K_value_; }
+	prec_t psi_value(void) const { return psi_value_; }
+	prec_t dtheta_value(void) const { return dtheta_value_; }
 
 	const Grid<prec_t>& F(void) const { return F_; }
 	const Grid<prec_t>& F_old(void) const { return F_old_; }

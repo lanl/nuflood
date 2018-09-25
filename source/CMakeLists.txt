@@ -1,12 +1,10 @@
-add_definitions(-DUSE_DOUBLE=1)
+add_definitions(-DUSE_DOUBLE=0)
 add_definitions(-DBIG_GRID=0)
 
 find_program(INTEL_COMPILER icc)
 
 if(INTEL_COMPILER)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11; -O3; -parallel; -openmp;
-	                     -lpthreads; -Wall; -g; -shared-intel;
-	                     -debug inline-debug-info")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -parallel -qopenmp -lpthread -Wall -g -shared-intel -debug inline-debug-info")
 	if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC")
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC")
