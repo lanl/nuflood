@@ -17,6 +17,7 @@ addons:
     packages:
       - cmake
       - lcov
+      - libgdal-dev
   artifacts:
     s3_region: ${AWS_REGION}
     paths: "./build/doc/html"
