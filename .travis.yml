@@ -24,8 +24,9 @@ addons:
       - libgdal-dev
   artifacts:
     s3_region: ${AWS_REGION}
-    paths: ${HOME}/build/lanl/nuflood/build/doc/html
+    working_dir: ${HOME}/build/lanl/nuflood/build/doc/html
     target_paths: ${TRAVIS_BUILD_NUMBER}
+    paths: .
 
 git:
   submodules: false
