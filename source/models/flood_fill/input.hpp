@@ -7,7 +7,7 @@
 #include <rapidjson/stringbuffer.h>
 #include "schema.h"
 
-struct PointSourceS {
+struct PointSource {
 	double x;
 	double y;
 	double value;
@@ -25,8 +25,8 @@ public:
 	const std::string output_depth_path(void) const { return output_depth_path_; }
 	const std::string output_wse_path(void) const { return output_wse_path_; }
 	const std::string output_summary_path(void) const { return output_summary_path_; }
-	const std::vector<PointSourceS>& point_sources_depth(void) const { return point_sources_depth_; }
-	const std::vector<PointSourceS>& point_sources_wse(void) const { return point_sources_wse_; }
+	const std::vector<PointSource>& point_sources_depth(void) const { return point_sources_depth_; }
+	const std::vector<PointSource>& point_sources_wse(void) const { return point_sources_wse_; }
 
 protected:
 	std::string elevation_path_;
@@ -35,8 +35,8 @@ protected:
 	std::string output_depth_path_;
 	std::string output_wse_path_;
 	std::string output_summary_path_;
-	std::vector<PointSourceS> point_sources_depth_;
-	std::vector<PointSourceS> point_sources_wse_;
+	std::vector<PointSource> point_sources_depth_;
+	std::vector<PointSource> point_sources_wse_;
 };
 
 inline Input::Input(std::string path) {
@@ -82,11 +82,11 @@ inline Input::Input(std::string path) {
 
 			if (point_list_data[i].HasMember("depth")) {
 				double value = point_list_data[i]["depth"].GetDouble();
-				PointSourceS point_source{x, y, value};
+				PointSource point_source{x, y, value};
 				point_sources_depth_.push_back(point_source);
 			} else if (point_list_data[i].HasMember("waterSurfaceElevation")) {
 				double value = point_list_data[i]["waterSurfaceElevation"].GetDouble(); 
-				PointSourceS point_source{x, y, value};
+				PointSource point_source{x, y, value};
 				point_sources_wse_.push_back(point_source);
 			}
 		}

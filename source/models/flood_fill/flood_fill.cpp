@@ -6,7 +6,7 @@
 
 FloodFill::FloodFill(const Input& input) {
 	input_ = &input;
-	num_seeds_ = num_wet_ = num_iterations_ = 0;
+	num_seeds_ = num_wet_;
 	B_.Read(input.elevation_path());
 
 	if (!input.depth_path().empty()) {
@@ -44,8 +44,8 @@ FloodFill::FloodFill(const Input& input) {
 			h_.SetAtIndex(ij, h_.nodata());
 		} else if (w_.GetFromIndex(ij) == w_.nodata()) {
 			w_.SetAtIndex(ij, B_.GetFromIndex(ij));
-			h_.SetAtIndex(ij, 0.0);
-		} else if (h_.GetFromIndex(ij) > 0.0) {
+			h_.SetAtIndex(ij, (prec_t)0);
+		} else if (h_.GetFromIndex(ij) > (prec_t)0) {
 			#pragma omp critical
 			{
 				INT_TYPE i = ij / B_.width();
@@ -70,17 +70,22 @@ void FloodFill::Grow(void) {
 				prec_t w_ij = w_.GetFromIndices(i, j);
 				if (w_ij == w_.nodata()) continue;
 
+				const int i_shift[4] = {-1, 1, 0, 0};
+				const int j_shift[4] = {0, 0, -1, 1};
+
 				for (INT_TYPE k = 0; k < 4; k++) {
-					INT_TYPE ii = i + k % 2 - k / 2;
-					INT_TYPE jj = j + (k + 1) % 2 - (k + 1)  / 3;
-					if (ii < 0 || ii > B_.height() - 1 || jj < 0 || jj > B_.width() - 1) continue;
+					INT_TYPE ii = i + i_shift[k];
+					if (ii < 0 || ii > B_.height() - 1) continue;
+
+					INT_TYPE jj = j + j_shift[k];
+					if (jj < 0 || jj > B_.width() - 1) continue;
 
 					prec_t B_ij = B_.GetFromIndices(ii, jj);
 					if (B_ij == B_.nodata()) continue;
 
 					prec_t h_ij = w_ij - B_ij;
 
-					if (h_ij > 0.0 && !wet_.Contains(ii, jj)) {
+					if (h_ij > (prec_t)0 && !wet_.Contains(ii, jj)) {
 						#pragma omp critical
 						{
 							seed_holder_.Insert(ii, jj);
@@ -118,7 +123,6 @@ void FloodFill::Run(void) {
 	while (num_seeds_ > 0) {
 		FloodFill::Grow();
 		FloodFill::UpdateWetCells();
-		num_iterations_++;
 	}
 
 	FloodFill::WriteResults();
@@ -139,6 +143,6 @@ int main(int argc, char* argv[]) {
 	// Run the model.
 	flood_fill.Run();
 
-	// Program executed successfully.
+	// Return code for successful execution.
 	return 0;
 }

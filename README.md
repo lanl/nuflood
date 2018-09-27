@@ -21,9 +21,9 @@
 
 Nuflood uses the following software as its dependencies:
 
-* [CMake](https://cmake.org/) as a general build tool
-* (optional) [CUDA](https://developer.nvidia.com/cuda-zone) for graphics processing unit parallelization
-* (optional) [Doxygen](http://www.doxygen.org) to build documentation
+* [CMake](https://cmake.org/) as a general build tool.
+* (optional) [CUDA](https://developer.nvidia.com/cuda-zone) for graphics processing unit parallelization.
+* (optional) [Doxygen](http://www.doxygen.nl) to build documentation.
 
 To compile the application:
 
