@@ -1,4 +1,4 @@
-# Nuflood
+## A fast simulator for surface water dynamics and flooding
 
 ## Build status
 
@@ -11,39 +11,28 @@
 [cov-badge]: https://codecov.io/gh/lanl/nuflood/branch/master/graph/badge.svg
 [cov-link]: https://codecov.io/gh/lanl/nuflood
 
+## Introduction
+
+## Highlights in v0.0.1 (2018-09-26)
+
+## Compatibility
+
 ## Installation
 
 Nuflood uses the following software as its dependencies:
 
-* CMake >= 2.8
-* gcc >= 4.8.4
+* [CMake](https://cmake.org/) as a general build tool
+* (optional) [CUDA](https://developer.nvidia.com/cuda-zone) for graphics processing unit parallelization
+* (optional) [Doxygen](http://www.doxygen.org) to build documentation
 
-To retrieve dependencies included as submodules (e.g., rapidjson), run:
+To compile the application:
 
-```bash
-git submodule update --init --recursive
-```
+1. Execute `git submodule update --init --recursive` to retrieve submodules.
+2. Create a directory called `build` in the nuflood directory.
+3. Change to the `build` directory and run `cmake ..` to configure the build. Windows users can do this with the cmake-gui application.
+4. On Windows, build the solution in the build directory. On Linux, run `make` from the build directory.
 
-Finally, compile the software:
-
-```bash
-mkdir build && cd build
-cmake .. && make
-```
-
-To compile on Mac OSX, ensure non-Clang `gcc` and `g++` compilers are installed, then run
-```bash
-mkdir build && cd build
-cmake -DCMAKE_C_COMPILER=/path/to/gcc -DCMAKE_CXX_COMPILER=/path/to/g++ ..
-make
-```
-
-## Build and run the Docker image
-
-```bash
-docker build -t nuflood .
-docker run -it --rm nuflood /bin/bash
-```
+## Usage at a glance
 
 ## License
 [BSD-ish](https://github.com/lanl/nuflood/blob/master/LICENSE.md)
