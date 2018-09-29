@@ -8,8 +8,8 @@ set(HEADER_FILES
     name_list.h parameter.h point_sink.h point_source.h point_source_list.h
     time_series.h timer.h itopography.h ioutput.h raster.hpp)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+ #include_directories(${CMAKE_CURRENT_BINARY_DIR})
+ #include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(Common STATIC ${SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(Common ${LIBS})
 

@@ -1,9 +1,0 @@
-{
-    "elevationPath": "elevation.asc",
-    "depthPath": "depth.asc",
-	 "output": {
-		 "waterSurfaceElevationPath": "tmp/waterSurfaceElevation.tif",
-		 "depthPath": "tmp/depth.tif",
-		 "summaryPath": "tmp/summary.json"
-	 }
-}

@@ -7,6 +7,7 @@
 #include <gdalwarper.h>
 #include <ogr_spatialref.h>
 #include <typeinfo>
+#include "precision.h"
 #include "error.h"
 
 //! Default Raster implementation.
