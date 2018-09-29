@@ -9,6 +9,6 @@ ADD_TEST(NAME unittest COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest WORKIN
 if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
 	include(CodeCoverage)
 	SETUP_TARGET_FOR_COVERAGE(${PROJECT_NAME}_coverage unittest coverage)
-	SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+	SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage -std=c++11")
 	SET(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
 endif()
