@@ -38,7 +38,7 @@ before_install:
 script:
   - mkdir build && cd build
   - cmake -DCMAKE_BUILD_TYPE=Coverage ..
-  - make
+  - make nuflood_coverage
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
