@@ -116,10 +116,22 @@ TEST(Raster, Add) {
 	raster_1.Add(raster_2);
 }
 
+TEST(Raster, AddInvalid) {
+	Raster<double> raster_1("../test/resources/elevation.tif", "elevation");
+	Raster<double> raster_2("../test/resources/mismatch.tif", "mismatch");
+	EXPECT_THROW(raster_1.Add(raster_2), std::system_error);
+}
+
 TEST(Raster, Subtract) {
 	Raster<double> raster_1("../test/resources/elevation.tif", "elevation");
 	Raster<double> raster_2("../test/resources/depth.tif", "depth");
 	raster_1.Subtract(raster_2);
+}
+
+TEST(Raster, SubtractInvalid) {
+	Raster<double> raster_1("../test/resources/elevation.tif", "elevation");
+	Raster<double> raster_2("../test/resources/mismatch.tif", "mismatch");
+	EXPECT_THROW(raster_1.Subtract(raster_2), std::system_error);
 }
 
 int main(int argc, char **argv) {
