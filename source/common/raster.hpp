@@ -19,9 +19,9 @@ class Raster {
 public:
 	// Constructors.
 	Raster(void);
-	Raster(std::string path, std::string name = "", GDALAccess access = GA_ReadOnly);
-	Raster(const Raster& raster, std::string path, std::string name = "");
-	Raster(const Raster& raster, std::string name = "");
+	Raster(std::string path, std::string name, GDALAccess access = GA_ReadOnly);
+	Raster(const Raster& raster, std::string path, std::string name);
+	Raster(const Raster& raster, std::string name);
 
 	// Destructor.
 	~Raster(void);
@@ -60,12 +60,12 @@ public:
 	INT_TYPE index(double x, double y) const;
 
 protected:
-	T* array_;
-	T nodata_;
-	GDALDataset* dataset_;
-	double geo_transform_[6];
-	std::string name_;
-	std::string path_;
+	T* array_ = nullptr;
+	T nodata_ = (T)(-9999);
+	GDALDataset* dataset_ = nullptr;
+	double geo_transform_[6] = {0, 0, 0, 0, 0, 0};
+	std::string name_ = "";
+	std::string path_ = "";
 };
 
 //! Constructor for Raster.
@@ -90,8 +90,8 @@ inline Raster<T>::Raster(void) {
 */
 template<class T>
 inline Raster<T>::Raster(std::string path, std::string name, GDALAccess access) {
-	name_ = name;
 	Raster<T>::Read(path);
+	name_ = name;
 }
 
 //! Constructor for Raster.
@@ -124,7 +124,6 @@ template<class T>
 inline Raster<T>::Raster(const Raster& raster, std::string name) {
 	Raster<T>::CopyFrom(raster);
 	name_ = name;
-	nodata_ = raster.nodata();
 }
 
 //! Copy another raster's data to this Raster.
@@ -161,9 +160,9 @@ inline void Raster<T>::CopyFrom(const Raster& raster) {
 
 //! Reads in a raster from a file path, overwriting any existing data.
 /*! \tparam Type of raster data. Default is double.
-	 \param path Path to raster file.
-	 \param access <a href="http://www.gdal.org/gdal_8h.html#a045e3967c208993f70257bfd40c9f1d7">
-	               Flag indicating read/write, or read-only access to raster</a>
+    \param path Path to raster file.
+    \param access <a href="http://www.gdal.org/gdal_8h.html#a045e3967c208993f70257bfd40c9f1d7">
+           Flag indicating read/write, or read-only access to raster</a>
 */
 template<class T>
 inline void Raster<T>::Read(std::string path, GDALAccess access) {
@@ -178,9 +177,8 @@ inline void Raster<T>::Read(std::string path, GDALAccess access) {
 	dataset_ = (GDALDataset*)GDALOpen(path_.c_str(), access);
 
 	if (dataset_ == NULL) {
-		std::string error_message = "Raster dataset \"" + path_ + "\" is invalid.";
-		std::cerr << "ERROR: " << error_message << std::endl;
-		std::exit(3);
+		std::string error_string = "Raster dataset \"" + path_ + "\" is invalid.";
+		throw std::system_error(std::error_code(), error_string);
 	}
 
 	dataset_->GetGeoTransform(geo_transform_);
@@ -196,8 +194,10 @@ inline void Raster<T>::Read(std::string path, GDALAccess access) {
 /*! \tparam Type of raster data. */
 template<class T>
 inline Raster<T>::~Raster(void) {
-	CPLFree(array_);
-	GDALClose(dataset_);
+	if (array_ != nullptr) {
+		CPLFree(array_);
+		GDALClose(dataset_);
+	}
 }
 
 //! Returns the flattened raster pixel index for a given location.
@@ -212,22 +212,15 @@ inline INT_TYPE Raster<T>::index(double x, double y) const {
 	double inv_transform[6];
 	bool success = GDALInvGeoTransform(transform, inv_transform);
 
-	if (!success) {
-		std::string error_message = "Raster inverse geotransform for \"" + path_ + "\" failed.";
-		std::cerr << "ERROR: " << error_message << std::endl;
-		std::exit(4);
-	}
-
 	INT_TYPE i = floor(inv_transform[3] + inv_transform[4] * x + inv_transform[5] * y);
 	INT_TYPE j = floor(inv_transform[0] + inv_transform[1] * x + inv_transform[2] * y);
 	INT_TYPE id = i * width() + j;
 
-	if (id < 0 || id >= num_pixels()) {
-		std::string error_message = "Index out of bounds for \"" + name_ + "\".";
-		std::cerr << "ERROR: " << error_message << std::endl;
-		std::exit(5);
-	} else {
+	if (id >= 0 && id < num_pixels()) {
 		return id;
+	} else {
+		std::string error_string = "Index out of bounds for \"" + name_ + "\".";
+		throw std::system_error(std::error_code(), error_string);
 	}
 }
 
@@ -246,8 +239,9 @@ inline void Raster<T>::Fill(T value) {
 template<class T>
 inline void Raster<T>::Update(void) {
 	GDALRasterBand* band = dataset_->GetRasterBand(1);
+	GDALDataType gdt = typeid(T) == typeid(double) ? GDT_Float64 : GDT_Float32;
 	CPLErrChk(band->RasterIO(GF_Write, 0, 0, width(), height(), array_,
-	                         width(), height(), GDT_Float64, 0, 0));
+	                         width(), height(), gdt, 0, 0));
 }
 
 //! Updates the raster file on disk using current data from `array_`.
@@ -339,16 +333,16 @@ inline void Raster<T>::Add(const Raster<T>& reference) {
 	T nodata_ref = (T)reference.nodata();
 
 	if (Raster<T>::EqualDimensions(reference)) {
-		//#pragma omp parallel for
+		#pragma omp parallel for
 		for (INT_TYPE i = 0; i < num_pixels(); i++) {
 			if (Raster<T>::GetFromIndex(i) != nodata_ && (T)reference.GetFromIndex(i) != nodata_ref) {
 				array_[i] += (T)reference.GetFromIndex(i);
 			}
 		}
 	} else {
-		std::string error_message = "'" + name_ + "' and '" + reference.name() + "' cannot be added. " + "Dimensions do not match.";
-		std::cerr << "ERROR: " << error_message << std::endl;
-		std::exit(5);
+		std::string error_string = "'" + name_ + "' and '" + reference.name() +
+		                           "' cannot be added. Dimensions do not match.";
+		throw std::system_error(std::error_code(), error_string);
 	}
 }
 
@@ -357,15 +351,15 @@ inline void Raster<T>::Subtract(const Raster<T>& reference) {
 	T nodata_ref = (T)reference.nodata();
 
 	if (Raster<T>::EqualDimensions(reference)) {
-		//#pragma omp parallel for
+		#pragma omp parallel for
 		for (INT_TYPE i = 0; i < num_pixels(); i++) {
 			if (Raster<T>::GetFromIndex(i) != nodata_ && (T)reference.GetFromIndex(i) != nodata_ref) {
 				array_[i] -= (T)reference.GetFromIndex(i);
 			}
 		}
 	} else {
-		std::string error_message = "'" + name_ + "' and '" + reference.name() + "' cannot be added. " + "Dimensions do not match.";
-		std::cerr << "ERROR: " << error_message << std::endl;
-		std::exit(5);
+		std::string error_string = "'" + name_ + "' and '" + reference.name() +
+		                           "' cannot be subtracted. Dimensions do not match.";
+		throw std::system_error(std::error_code(), error_string);
 	}
 }
