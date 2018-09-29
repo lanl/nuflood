@@ -10,18 +10,9 @@ namespace {
 	const size_t ERROR_UNHANDLED_EXCEPTION = 3;
 }
 
-void PrintErrorAndExit(const std::string& error_message, int exit_code) {
-	std::cerr << "Error: " << error_message << std::endl;
-	std::exit(exit_code);
-}
-
-void PrintWarning(const std::string& warning_message) {
-	std::cerr << "Warning: " << warning_message << std::endl;
-}
-
 void CPLErrChk(CPLErr errnum) {
 	if (errnum == CE_Failure) {
-		std::cerr << CPLGetLastErrorMsg() << std::endl;
-		exit(ERROR_IN_GDAL);
+		std::string error_string = CPLGetLastErrorMsg();
+		throw std::system_error(std::error_code(), error_string);
 	}
 }
