@@ -25,7 +25,7 @@ addons:
   artifacts:
     s3_region: ${AWS_REGION}
     working_dir: ${HOME}/build/lanl/nuflood/build/doc/html
-    target_paths: ${TRAVIS_BUILD_NUMBER}
+    target_paths: ${TRAVIS_BRANCH}
     paths: .
 
 git:

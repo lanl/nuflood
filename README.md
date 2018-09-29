@@ -1,4 +1,4 @@
-## A fast simulator for surface water dynamics and flooding
+## A fast simulator for surface water dynamics
 
 ## Build status
 

@@ -6,6 +6,7 @@
 #include <gdal_priv.h>
 #include <gdalwarper.h>
 #include <ogr_spatialref.h>
+#include <typeinfo>
 #include "error.h"
 
 //! Default Raster implementation.
@@ -185,8 +186,9 @@ inline void Raster<T>::Read(std::string path, GDALAccess access) {
 	GDALRasterBand* band = dataset_->GetRasterBand(1);
 	nodata_ = (T)band->GetNoDataValue();
 	array_ = (T*)CPLMalloc(width()*height()*sizeof(T));
+	GDALDataType gdt = typeid(T) == typeid(double) ? GDT_Float64 : GDT_Float32;
 	CPLErrChk(band->RasterIO(GF_Read, 0, 0, width(), height(), array_,
-	                         width(), height(), GDT_Float64, 0, 0));
+	                         width(), height(), gdt, 0, 0));
 }
 
 //! Destructor for Raster.
