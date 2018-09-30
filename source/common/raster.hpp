@@ -255,7 +255,8 @@ inline void Raster<T>::Write(const std::string path) {
 	GDALDriver* driver = GetGDALDriverManager()->GetDriverByName("GTiff");
 	GDALDataset* dataset = driver->CreateCopy(path.c_str(), dataset_, FALSE, NULL, NULL, NULL);
 	GDALRasterBand* band = dataset->GetRasterBand(1);
-	CPLErrChk(band->RasterIO(GF_Write, 0, 0, width(), height(), array_, width(), height(), GDT_Float64, 0, 0));
+	GDALDataType gdt = typeid(T) == typeid(double) ? GDT_Float64 : GDT_Float32;
+	CPLErrChk(band->RasterIO(GF_Write, 0, 0, width(), height(), array_, width(), height(), gdt, 0, 0));
 	GDALClose((GDALDatasetH)dataset);
 	CSLDestroy(options);
 }

@@ -35,6 +35,11 @@ TEST(Raster, ReadInvalid) {
 	EXPECT_THROW(raster.Read("../test/resources/invalid.tif"), std::system_error);
 }
 
+TEST(Raster, ReadIncomplete) {
+	Raster<double> raster;
+	EXPECT_THROW(raster.Read("../test/resources/incomplete.asc"), std::system_error);
+}
+
 TEST(Raster, CopyOverwrite) {
 	Raster<double> raster_1("../test/resources/elevation.tif", "elevation");
 	Raster<double> raster_2("../test/resources/depth.tif", "depth");
