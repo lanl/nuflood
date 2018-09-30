@@ -766,11 +766,6 @@ WARN_LOGFILE           =
 
 INPUT                  = README.md \
                          source/common/raster.hpp \
-                         source/common/gpu_raster.hpp \
-                         source/models/kurganov_petrova_gpu/kurganov_petrova_gpu.h \
-                         source/models/kurganov_petrova_gpu/kurganov_petrova_gpu.cpp \
-                         source/models/kurganov_petrova_gpu/compute_time_step.h \
-                         source/models/kurganov_petrova_gpu/compute_time_step.cu \
                          doc/faq.md
 
 # This tag can be used to specify the character encoding of the source files
