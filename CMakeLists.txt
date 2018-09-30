@@ -26,6 +26,7 @@ include_directories(${GDAL_INCLUDE_DIR})
 link_directories(${GDAL_LIBRARY})
 list(APPEND LIBS ${GDAL_LIBRARY})
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 include_directories("libraries/rapidjson/include")
 include_directories(${CMAKE_SOURCE_DIR}/source)
 add_subdirectory(libraries/googletest)
