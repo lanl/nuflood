@@ -1,4 +1,5 @@
 find_program(INTEL_COMPILER icc)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 if(INTEL_COMPILER)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -parallel -qopenmp -lpthread -Wall -g -shared-intel -debug inline-debug-info")

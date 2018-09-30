@@ -41,7 +41,7 @@ public:
 	INT_TYPE index(double x, double y) const;
 
 	// Functions to set pixel values.
-	void SetAtIndex(INT_TYPE i, T value);
+	void SetAtIndex(INT_TYPE index, T value);
 	void SetAtCoordinates(const double x, const double y, T value);
 	void SetAtIndices(const INT_TYPE i, const INT_TYPE j, T value);
 
@@ -91,6 +91,7 @@ inline Raster<T>::Raster(void) {
 //! Constructor for Raster.
 /*! \tparam Type of raster data. Default is double.
 	 \param path Path to raster file.
+	 \param name Name of the raster.
 	 \param access <a href="http://www.gdal.org/gdal_8h.html#a045e3967c208993f70257bfd40c9f1d7">
 	               Flag indicating read/write, or read-only access to raster</a>
 */
@@ -334,8 +335,8 @@ inline void Raster<T>::SetAtIndices(const INT_TYPE i, const INT_TYPE j, T value)
 	 \param value New value of the pixel.
 */
 template<class T>
-inline void Raster<T>::SetAtIndex(const INT_TYPE i, const T value) {
-	array_[i] = value;
+inline void Raster<T>::SetAtIndex(const INT_TYPE index, const T value) {
+	array_[index] = value;
 }
 
 //! Elementwise addition of the raster with another.
