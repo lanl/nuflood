@@ -5,11 +5,7 @@ IF(NOT DOXYGEN_FOUND)
 ELSE()
 	SET(SOURCE_FILES
 	    ${CMAKE_CURRENT_LIST_DIR}/../source/common/raster.hpp
-	    ${CMAKE_CURRENT_LIST_DIR}/../source/common/gpu_raster.hpp
-	    ${CMAKE_CURRENT_LIST_DIR}/../source/models/kurganov_petrova_gpu/kurganov_petrova_gpu.h
-	    ${CMAKE_CURRENT_LIST_DIR}/../source/models/kurganov_petrova_gpu/kurganov_petrova_gpu.cpp
-	    ${CMAKE_CURRENT_LIST_DIR}/../source/models/kurganov_petrova_gpu/compute_time_step.h
-	    ${CMAKE_CURRENT_LIST_DIR}/../source/models/kurganov_petrova_gpu/compute_time_step.cu)
+	    ${CMAKE_CURRENT_LIST_DIR}/../source/common/error.h)
 	FILE(GLOB MARKDOWN_DOC ${CMAKE_CURRENT_LIST_DIR}/../doc/*.md)
 	LIST(APPEND MARKDOWN_DOC ${CMAKE_CURRENT_LIST_DIR}/../README.md)
 
