@@ -29,8 +29,8 @@ To compile the application:
 
 1. Execute `git submodule update --init --recursive` to retrieve submodules.
 2. Create a directory called `build` in the nuflood directory.
-3. Change to the `build` directory and run `cmake ..` to configure the build. Windows users can do this with the cmake-gui application.
-4. On Windows, build the solution in the build directory. On Linux, run `make` from the build directory.
+3. Change to the `build` directory and run `cmake ..` to configure the build.
+4. Run `make` from the build directory.
 
 ## Usage at a glance
 
