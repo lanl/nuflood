@@ -48,7 +48,8 @@ TEST(Raster, CopyOverwrite) {
 
 TEST(Raster, Index) {
 	Raster<double> raster("../test/resources/elevation.tif", "raster");
-	INT_TYPE index = raster.index(8.0, 8.0);
+	int_t index = raster.index(8.0, 8.0);
+	EXPECT_EQ(index, 136);
 }
 
 TEST(Raster, IndexInvalid) {
@@ -84,23 +85,26 @@ TEST(Raster, EqualDimensions) {
 TEST(Raster, GetFromCoordinates) {
 	Raster<double> raster("../test/resources/elevation.tif", "raster");
 	double value = raster.GetFromCoordinates(8.0, 8.0);
+	EXPECT_EQ(value, 1.0);
 }
 
 TEST(Raster, GetFromIndices) {
 	Raster<double> raster("../test/resources/elevation.tif", "raster");
-	INT_TYPE i = 8, j = 8;
+	int_t i = 8, j = 8;
 	double value = raster.GetFromIndices(i, j);
+	EXPECT_EQ(value, 1.0);
 }
 
 TEST(Raster, GetFromIndex) {
 	Raster<double> raster("../test/resources/elevation.tif", "raster");
-	INT_TYPE index = raster.index(8.0, 8.0);
+	int_t index = raster.index(8.0, 8.0);
 	double value = raster.GetFromIndex(index);
+	EXPECT_EQ(value, 1.0);
 }
 
 TEST(Raster, SetAtIndex) {
 	Raster<double> raster("../test/resources/elevation.tif", "raster");
-	INT_TYPE index = raster.index(8.0, 8.0);
+	int_t index = raster.index(8.0, 8.0);
 	raster.SetAtIndex(index, 10.0);
 }
 
@@ -111,7 +115,7 @@ TEST(Raster, SetAtCoordinates) {
 
 TEST(Raster, SetAtIndices) {
 	Raster<double> raster("../test/resources/elevation.tif", "raster");
-	INT_TYPE i = 8, j = 8;
+	int_t i = 8, j = 8;
 	raster.SetAtIndices(i, j, 10.0);
 }
 

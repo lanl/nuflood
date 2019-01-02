@@ -1,12 +1,13 @@
-#include <omp.h>
 #include <iostream>
-#include <common/index_table.h>
 #include "flood_fill.h"
-#include "input.hpp"
+
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
 
 FloodFill::FloodFill(const Input& input) {
 	input_ = &input;
-	num_seeds_ = num_wet_;
+	num_seeds_ = num_wet_ = 0;
 	B_.Read(input.elevation_path());
 
 	if (!input.depth_path().empty()) {
@@ -24,21 +25,21 @@ FloodFill::FloodFill(const Input& input) {
 	}
 
 	for (auto it : input.point_sources_depth()) {
-		INT_TYPE ij = h_.index(it.x, it.y);
+		int_t ij = h_.index(it.x, it.y);
 		prec_t h_value = it.value > (prec_t)0 ? it.value : (prec_t)0;
 		h_.SetAtIndex(ij, h_value);
 		w_.SetAtIndex(ij, B_.GetFromIndex(ij) + h_value);
 	}
 
 	for (auto it : input.point_sources_wse()) {
-		INT_TYPE ij = w_.index(it.x, it.y);
+		int_t ij = w_.index(it.x, it.y);
 		prec_t w_value = it.value > B_.GetFromIndex(ij) ? it.value : B_.GetFromIndex(ij);
 		w_.SetAtIndex(ij, w_value);
 		h_.SetAtIndex(ij, w_value - B_.GetFromIndex(ij));
 	}
 
 	#pragma omp parallel for
-	for (INT_TYPE ij = 0; ij < B_.num_pixels(); ij++) {
+	for (int_t ij = 0; ij < B_.num_pixels(); ij++) {
 		if (B_.GetFromIndex(ij) == B_.nodata()) {
 			w_.SetAtIndex(ij, w_.nodata());
 			h_.SetAtIndex(ij, h_.nodata());
@@ -48,10 +49,10 @@ FloodFill::FloodFill(const Input& input) {
 		} else if (h_.GetFromIndex(ij) > (prec_t)0) {
 			#pragma omp critical
 			{
-				INT_TYPE i = ij / B_.width();
-				INT_TYPE j = ij % B_.width();
-				num_seeds_ += (INT_TYPE)seed_.Insert(i, j);
-				num_wet_ += (INT_TYPE)wet_.Insert(i, j);
+				int_t i = ij / B_.width();
+				int_t j = ij % B_.width();
+				num_seeds_ += (int_t)seed_.Insert(i, j);
+				num_wet_ += (int_t)wet_.Insert(i, j);
 			}
 		}
 	}
@@ -65,19 +66,19 @@ void FloodFill::Grow(void) {
 	{
 		for (auto it : seed_) {
 			#pragma omp task firstprivate(it)
-			for (const INT_TYPE& i : it.second) {
-				const INT_TYPE j = it.first;
+			for (const int_t& i : it.second) {
+				const int_t j = it.first;
 				prec_t w_ij = w_.GetFromIndices(i, j);
 				if (w_ij == w_.nodata()) continue;
 
 				const int i_shift[4] = {-1, 1, 0, 0};
 				const int j_shift[4] = {0, 0, -1, 1};
 
-				for (INT_TYPE k = 0; k < 4; k++) {
-					INT_TYPE ii = i + i_shift[k];
+				for (int_t k = 0; k < 4; k++) {
+					int_t ii = i + i_shift[k];
 					if (ii < 0 || ii > B_.height() - 1) continue;
 
-					INT_TYPE jj = j + j_shift[k];
+					int_t jj = j + j_shift[k];
 					if (jj < 0 || jj > B_.width() - 1) continue;
 
 					prec_t B_ij = B_.GetFromIndices(ii, jj);
@@ -106,10 +107,11 @@ void FloodFill::UpdateWetCells(void) {
 	num_seeds_ = 0;
 
 	for (auto it : seed_holder_) {
-		INT_TYPE j = it.first;
-		for (const INT_TYPE& i : it.second) {
-			num_seeds_ += (INT_TYPE)seed_.Insert(i, j);
-			num_wet_ += (INT_TYPE)wet_.Insert(i, j);
+		int_t j = it.first;
+
+		for (const int_t& i : it.second) {
+			num_seeds_ += (int_t)seed_.Insert(i, j);
+			num_wet_ += (int_t)wet_.Insert(i, j);
 		}
 	}
 }
@@ -130,19 +132,21 @@ void FloodFill::Run(void) {
 
 int main(int argc, char* argv[]) {
 	// Check if a scenario file has been specified.
-	if (argc <= 1) {
-		PrintErrorAndExit("Scenario file has not been specified.");
+	if (argc > 1) {
+		// Read in the input.
+		Input input(argv[1]);
+
+		// Set up the model.
+		FloodFill flood_fill(input);
+
+		// Run the model.
+		flood_fill.Run();
+
+		// Return code for successful execution.
+		return 0;
+	} else {
+		std::string error_string = "Scenario file has not been specified.";
+		std::cerr << error_string << std::endl;
+		return 1; // Return code for undefined scenario.
 	}
-
-	// Read in the input.
-	Input input(argv[1]);
-
-	// Set up the model.
-	FloodFill flood_fill(input);
-
-	// Run the model.
-	flood_fill.Run();
-
-	// Return code for successful execution.
-	return 0;
 }

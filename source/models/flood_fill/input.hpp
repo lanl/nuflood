@@ -5,13 +5,14 @@
 #include <rapidjson/document.h>
 #include <rapidjson/schema.h>
 #include <rapidjson/stringbuffer.h>
+#include "point_source.h"
 #include "schema.h"
 
-struct PointSource {
-	double x;
-	double y;
-	double value;
-};
+//struct PointSource {
+//	double x;
+//	double y;
+//	double value;
+//};
 
 class Input {
 public:

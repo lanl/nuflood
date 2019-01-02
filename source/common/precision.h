@@ -10,8 +10,12 @@ typedef double prec_t;
 typedef float prec_t;
 #endif
 
-#ifdef BIG_GRID
-#define INT_TYPE long unsigned int
+#ifndef USE_LONG
+#define USE_LONG 0
+#endif
+
+#if USE_LONG
+typedef unsigned long int_t;
 #else
-#define INT_TYPE unsigned int
+typedef unsigned int int_t;
 #endif

@@ -1,44 +1,66 @@
-project(nuflood)
-cmake_minimum_required(VERSION 2.8)
-cmake_policy(SET CMP0015 NEW)
+PROJECT(nuflood)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
+CMAKE_POLICY(SET CMP0015 NEW)
+SET(DEFAULT_BUILD_TYPE "Release")
 
-add_definitions(-DUSE_DOUBLE=1)
-add_definitions(-DBIG_GRID=0)
+ADD_DEFINITIONS(-DUSE_DOUBLE=1)
+ADD_DEFINITIONS(-DUSE_LONG=1)
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
-include(${PROJECT_SOURCE_DIR}/CMakeModules/bin2h.cmake)
-include(${PROJECT_SOURCE_DIR}/CMakeModules/text2h.cmake)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output)
-
-foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-	string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/output)
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/output)
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/output)
-endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
-
-# Set GDAL build variables.
-find_package(GDAL REQUIRED)
-include_directories(${GDAL_INCLUDE_DIR})
-link_directories(${GDAL_LIBRARY})
-list(APPEND LIBS ${GDAL_LIBRARY})
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-include_directories("libraries/rapidjson/include")
-include_directories(${CMAKE_SOURCE_DIR}/source)
-add_subdirectory(libraries/googletest)
-add_subdirectory(source)
-
-option(NUFLOOD_BUILD_DOC "Build Nuflood documentation." ON)
-if(NUFLOOD_BUILD_DOC)
-	add_subdirectory(doc)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+	MESSAGE(STATUS "Setting build type to \"${DEFAULT_BUILD_TYPE}\" as none was specified.")
+	SET(CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE STRING "Choose the type of build." FORCE)
+	SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "Coverage")
 endif()
 
-option(BUILD_TESTS "Build all tests." ON)
-if(BUILD_TESTS)
-	enable_testing()
-	add_subdirectory(test)
-endif()
+SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
+INCLUDE(${PROJECT_SOURCE_DIR}/CMakeModules/bin2h.cmake)
+INCLUDE(${PROJECT_SOURCE_DIR}/CMakeModules/text2h.cmake)
+
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/dep)
+
+# Find GDAL libraries.
+FIND_PACKAGE(GDAL REQUIRED)
+INCLUDE_DIRECTORIES(${GDAL_INCLUDE_DIR})
+LINK_DIRECTORIES(${GDAL_LIBRARY})
+LIST(APPEND LIBS ${GDAL_LIBRARY})
+
+# Try to find CUDA installation.
+FIND_PACKAGE(CUDA QUIET)
+IF(CUDA_FOUND)
+	INCLUDE_DIRECTORIES(${CUDA_INCLUDE_DIRS})
+	LINK_DIRECTORIES(${CUDA_LIBRARIES})
+	LIST(APPEND LIBS ${CUDA_LIBRARIES})
+
+	SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
+	SET(CUDA_NVCC_FLAGS "-std=c++11")
+
+	IF(NOT(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Coverage"))
+		SET(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11; -O3; -use_fast_math;
+									-ftz=true; -prec-div=false; -prec-sqrt=false;
+									-Xptxas -dlcm=ca; -lineinfo; -Wno-deprecated-gpu-targets")
+	ELSE()
+		SET(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -g -O0")
+	ENDIF()
+ELSE()
+	MESSAGE(STATUS "Could NOT find CUDA.")
+ENDIF()
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+INCLUDE_DIRECTORIES("libraries/rapidjson/include")
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/source)
+
+ADD_SUBDIRECTORY(libraries/googletest)
+ADD_SUBDIRECTORY(source)
+
+OPTION(NUFLOOD_BUILD_DOC "Build Nuflood documentation." ON)
+IF(NUFLOOD_BUILD_DOC)
+	ADD_SUBDIRECTORY(doc)
+ENDIF()
+
+OPTION(BUILD_TESTS "Build all tests." ON)
+IF(BUILD_TESTS)
+	ENABLE_TESTING()
+	ADD_SUBDIRECTORY(test)
+ENDIF()

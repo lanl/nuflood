@@ -35,15 +35,15 @@ public:
 	void Write(const std::string path);
 
 	// Functions to get pixel values and indices.
-	T GetFromIndex(const INT_TYPE i) const;
+	T GetFromIndex(const int_t i) const;
 	T GetFromCoordinates(const double x, const double y) const;
-	T GetFromIndices(const INT_TYPE i, const INT_TYPE j) const;
-	INT_TYPE index(double x, double y) const;
+	T GetFromIndices(const int_t i, const int_t j) const;
+	int_t index(double x, double y) const;
 
 	// Functions to set pixel values.
-	void SetAtIndex(INT_TYPE index, T value);
+	void SetAtIndex(int_t index, T value);
 	void SetAtCoordinates(const double x, const double y, T value);
-	void SetAtIndices(const INT_TYPE i, const INT_TYPE j, T value);
+	void SetAtIndices(const int_t i, const int_t j, T value);
 
 	// Functions that modify all pixel values.
 	void Add(const Raster<T>& reference);
@@ -57,9 +57,9 @@ public:
 	T* array(void) const { return array_; }
 	T nodata(void) const { return nodata_; }
 	GDALDataset* dataset(void) const { return dataset_; }
-	INT_TYPE height(void) const { return dataset_->GetRasterBand(1)->GetYSize(); }
-	INT_TYPE width(void) const { return dataset_->GetRasterBand(1)->GetXSize(); }
-	INT_TYPE num_pixels(void) const { return width() * height(); }
+	int_t height(void) const { return dataset_->GetRasterBand(1)->GetYSize(); }
+	int_t width(void) const { return dataset_->GetRasterBand(1)->GetXSize(); }
+	int_t num_pixels(void) const { return width() * height(); }
 	double cellsize_x(void) const { return geo_transform_[1]; }
 	double cellsize_y(void) const { return -geo_transform_[5]; }
 	std::string name(void) const { return name_; }
@@ -209,15 +209,20 @@ inline Raster<T>::~Raster(void) {
 	 \param y y-coordinate of the pixel.
 */
 template<class T>
-inline INT_TYPE Raster<T>::index(double x, double y) const {
+inline int_t Raster<T>::index(double x, double y) const {
 	double transform[6];
 	dataset_->GetGeoTransform(transform);
 	double inv_transform[6];
 	bool success = GDALInvGeoTransform(transform, inv_transform);
 
-	INT_TYPE i = floor(inv_transform[3] + inv_transform[4] * x + inv_transform[5] * y);
-	INT_TYPE j = floor(inv_transform[0] + inv_transform[1] * x + inv_transform[2] * y);
-	INT_TYPE id = i * width() + j;
+	if (!success) {
+		std::string error_string = "Cannot invert GeoTransform coefficients.";
+		throw std::system_error(std::error_code(), error_string);
+	}
+
+	int_t i = floor(inv_transform[3] + inv_transform[4] * x + inv_transform[5] * y);
+	int_t j = floor(inv_transform[0] + inv_transform[1] * x + inv_transform[2] * y);
+	int_t id = i * width() + j;
 
 	if (id >= 0 && id < num_pixels()) {
 		return id;
@@ -281,7 +286,7 @@ inline bool Raster<T>::EqualDimensions(const Raster<T>& raster) const {
 */
 template<class T>
 inline T Raster<T>::GetFromCoordinates(const double x, const double y) const {
-	INT_TYPE i = Raster<T>::index(x, y);
+	int_t i = Raster<T>::index(x, y);
 	return array_[i];
 }
 
@@ -291,8 +296,8 @@ inline T Raster<T>::GetFromCoordinates(const double x, const double y) const {
 	 \param j Column index of the pixel.
 */
 template<class T>
-inline T Raster<T>::GetFromIndices(const INT_TYPE i, const INT_TYPE j) const {
-	INT_TYPE ij = i * width() + j;
+inline T Raster<T>::GetFromIndices(const int_t i, const int_t j) const {
+	int_t ij = i * width() + j;
 	return array_[ij];
 }
 
@@ -301,7 +306,7 @@ inline T Raster<T>::GetFromIndices(const INT_TYPE i, const INT_TYPE j) const {
 	 \param index Flattened index of the pixel (i.e., row * width + column).
 */
 template<class T>
-inline T Raster<T>::GetFromIndex(const INT_TYPE index) const {
+inline T Raster<T>::GetFromIndex(const int_t index) const {
 	return array_[index];
 }
 
@@ -313,7 +318,7 @@ inline T Raster<T>::GetFromIndex(const INT_TYPE index) const {
 */
 template<class T>
 inline void Raster<T>::SetAtCoordinates(const double x, const double y, T value) {
-	INT_TYPE i = Raster<T>::index(x, y);
+	int_t i = Raster<T>::index(x, y);
 	array_[i] = value;
 }
 
@@ -324,8 +329,8 @@ inline void Raster<T>::SetAtCoordinates(const double x, const double y, T value)
 	 \param value New value of the pixel.
 */
 template<class T>
-inline void Raster<T>::SetAtIndices(const INT_TYPE i, const INT_TYPE j, T value) {
-	INT_TYPE ij = i * width() + j;
+inline void Raster<T>::SetAtIndices(const int_t i, const int_t j, T value) {
+	int_t ij = i * width() + j;
 	array_[ij] = value;
 }
 
@@ -335,7 +340,7 @@ inline void Raster<T>::SetAtIndices(const INT_TYPE i, const INT_TYPE j, T value)
 	 \param value New value of the pixel.
 */
 template<class T>
-inline void Raster<T>::SetAtIndex(const INT_TYPE index, const T value) {
+inline void Raster<T>::SetAtIndex(const int_t index, const T value) {
 	array_[index] = value;
 }
 
@@ -349,7 +354,7 @@ inline void Raster<T>::Add(const Raster<T>& reference) {
 
 	if (Raster<T>::EqualDimensions(reference)) {
 		#pragma omp parallel for
-		for (INT_TYPE i = 0; i < num_pixels(); i++) {
+		for (int_t i = 0; i < num_pixels(); i++) {
 			if (Raster<T>::GetFromIndex(i) != nodata_ && (T)reference.GetFromIndex(i) != nodata_ref) {
 				array_[i] += (T)reference.GetFromIndex(i);
 			}
@@ -371,7 +376,7 @@ inline void Raster<T>::Subtract(const Raster<T>& reference) {
 
 	if (Raster<T>::EqualDimensions(reference)) {
 		#pragma omp parallel for
-		for (INT_TYPE i = 0; i < num_pixels(); i++) {
+		for (int_t i = 0; i < num_pixels(); i++) {
 			if (Raster<T>::GetFromIndex(i) != nodata_ && (T)reference.GetFromIndex(i) != nodata_ref) {
 				array_[i] -= (T)reference.GetFromIndex(i);
 			}

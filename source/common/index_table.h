@@ -2,27 +2,27 @@
 
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 #include <utility>
+#include <vector>
 #include "precision.h"
 
-typedef std::unordered_map<INT_TYPE, std::unordered_set<INT_TYPE> > Map;
+typedef std::unordered_map<int_t, std::unordered_set<int_t> > Map;
 
 class IndexTable {
 public:
 	IndexTable(void);
-	bool Insert(const INT_TYPE i, const INT_TYPE j);
-	void InsertAll(const INT_TYPE num_columns, const INT_TYPE num_rows);
-	bool Contains(const INT_TYPE i, const INT_TYPE j) const;
+	bool Insert(const int_t i, const int_t j);
+	void InsertAll(const int_t num_columns, const int_t num_rows);
+	bool Contains(const int_t i, const int_t j) const;
 	void Clear(void);
-	INT_TYPE num_elements(void) const;
 
 	Map::iterator begin(void);
 	Map::iterator end(void);
 
-	INT_TYPE num(void) { return num_; }
+	int_t num_elements(void) const;
+	int_t num(void) { return num_; }
 
 private:
-	INT_TYPE num_;
+	int_t num_;
 	Map map_;
 };

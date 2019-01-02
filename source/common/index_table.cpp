@@ -4,14 +4,15 @@ IndexTable::IndexTable(void) {
 	num_ = 0;
 }
 
-bool IndexTable::Insert(const INT_TYPE i, const INT_TYPE j) {
-	Map::iterator row_found = map_.find(j);
+bool IndexTable::Insert(const int_t i, const int_t j) {
+	Map::iterator row_found = map_.find(i);
+
 	if (row_found == map_.end()) {
-		map_.insert(std::make_pair(j, std::unordered_set<INT_TYPE>({i})));
+		map_.insert(std::make_pair(i, std::unordered_set<int_t>({j})));
 		return true;
 	} else {
-		if (row_found->second.find(i) == row_found->second.end()) {
-			row_found->second.insert(i);
+		if (row_found->second.find(j) == row_found->second.end()) {
+			row_found->second.insert(j);
 			return true;
 		} else {
 			return false;
@@ -19,19 +20,19 @@ bool IndexTable::Insert(const INT_TYPE i, const INT_TYPE j) {
 	}
 }
 
-void IndexTable::InsertAll(const INT_TYPE num_columns,
-                           const INT_TYPE num_rows) {
-	for (INT_TYPE j = 0; j < num_rows; j++) {
-		for (INT_TYPE i = 0; i < num_columns; i++) {
+void IndexTable::InsertAll(const int_t num_columns, const int_t num_rows) {
+	for (int_t i = 0; i < num_rows; i++) {
+		for (int_t j = 0; j < num_columns; j++) {
 			Insert(i, j);
 		}
 	}
 }
 
-bool IndexTable::Contains(const INT_TYPE i, const INT_TYPE j) const {
-	Map::const_iterator row_found = map_.find(j);
+bool IndexTable::Contains(const int_t i, const int_t j) const {
+	Map::const_iterator row_found = map_.find(i);
+
 	if (row_found != map_.end()) {
-		return row_found->second.find(i) != row_found->second.end();
+		return row_found->second.find(j) != row_found->second.end();
 	} else {
 		return false;
 	}
@@ -42,7 +43,7 @@ void IndexTable::Clear(void) {
 	num_ = 0;
 }
 
-INT_TYPE IndexTable::num_elements(void) const {
+int_t IndexTable::num_elements(void) const {
 	return num_;
 }
 
