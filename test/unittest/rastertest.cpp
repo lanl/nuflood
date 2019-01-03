@@ -52,6 +52,11 @@ TEST(Raster, Index) {
 	EXPECT_EQ(index, 136);
 }
 
+TEST(Raster, IndexFailure) {
+	Raster<double> raster("../test/resources/uninvertible.tif", "raster");
+	EXPECT_THROW(raster.index(0.0, 0.0), std::system_error);
+}
+
 TEST(Raster, IndexInvalid) {
 	Raster<double> raster("../test/resources/elevation.tif", "raster");
 	EXPECT_THROW(raster.index(256.0, 256.0), std::system_error);
@@ -141,9 +146,4 @@ TEST(Raster, SubtractInvalid) {
 	Raster<double> raster_1("../test/resources/elevation.tif", "elevation");
 	Raster<double> raster_2("../test/resources/mismatch.tif", "mismatch");
 	EXPECT_THROW(raster_1.Subtract(raster_2), std::system_error);
-}
-
-int main(int argc, char **argv) {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
 }

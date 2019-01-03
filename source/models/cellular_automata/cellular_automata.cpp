@@ -1,11 +1,11 @@
 #include <iostream>
-#include "flood_fill.h"
+#include "cellular_automata.h"
 
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
 
-FloodFill::FloodFill(const Input& input) {
+CellularAutomata::CellularAutomata(const Input& input) {
 	input_ = &input;
 	num_seeds_ = num_wet_ = 0;
 	B_.Read(input.elevation_path());
@@ -58,7 +58,7 @@ FloodFill::FloodFill(const Input& input) {
 	}
 }
 
-void FloodFill::Grow(void) {
+void CellularAutomata::Grow(void) {
 	seed_holder_.Clear();
 
 	#pragma omp parallel
@@ -102,7 +102,7 @@ void FloodFill::Grow(void) {
 	}
 }
 
-void FloodFill::UpdateWetCells(void) {
+void CellularAutomata::UpdateWetCells(void) {
 	seed_.Clear();
 	num_seeds_ = 0;
 
@@ -116,37 +116,16 @@ void FloodFill::UpdateWetCells(void) {
 	}
 }
 
-void FloodFill::WriteResults(void) {
+void CellularAutomata::WriteResults(void) {
 	if (!input_->output_depth_path().empty()) h_.Write(input_->output_depth_path());
 	if (!input_->output_wse_path().empty()) w_.Write(input_->output_wse_path());
 }
 
-void FloodFill::Run(void) {
+void CellularAutomata::Run(void) {
 	while (num_seeds_ > 0) {
-		FloodFill::Grow();
-		FloodFill::UpdateWetCells();
+		CellularAutomata::Grow();
+		CellularAutomata::UpdateWetCells();
 	}
 
-	FloodFill::WriteResults();
-}
-
-int main(int argc, char* argv[]) {
-	// Check if a scenario file has been specified.
-	if (argc > 1) {
-		// Read in the input.
-		Input input(argv[1]);
-
-		// Set up the model.
-		FloodFill flood_fill(input);
-
-		// Run the model.
-		flood_fill.Run();
-
-		// Return code for successful execution.
-		return 0;
-	} else {
-		std::string error_string = "Scenario file has not been specified.";
-		std::cerr << error_string << std::endl;
-		return 1; // Return code for undefined scenario.
-	}
+	CellularAutomata::WriteResults();
 }

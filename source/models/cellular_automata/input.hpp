@@ -1,18 +1,13 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 #include <rapidjson/filereadstream.h>
 #include <rapidjson/document.h>
 #include <rapidjson/schema.h>
 #include <rapidjson/stringbuffer.h>
 #include "point_source.h"
 #include "schema.h"
-
-//struct PointSource {
-//	double x;
-//	double y;
-//	double value;
-//};
 
 class Input {
 public:
@@ -43,7 +38,7 @@ protected:
 inline Input::Input(std::string path) {
 	// Create the schema document object.
 	rapidjson::Document schema_document;
-	schema_document.Parse(FLOODFILL_SCHEMA);
+	schema_document.Parse(CELLULARAUTOMATA_SCHEMA);
 	rapidjson::SchemaDocument schema(schema_document);
 
 	char buffer[65536];
@@ -58,12 +53,12 @@ inline Input::Input(std::string path) {
 
 	if (!reader.GetParseResult()) {
 		if (reader.IsValid()) {
-			std::cerr << "Scenario file '" + path + "' is not a valid JSON file." << std::endl;
+			std::string error_string = "Scenario file '" + path + "' is not a valid JSON file.";
+			throw std::system_error(std::error_code(), error_string);
 		} else {
-			std::cerr << "Scenario file '" + path + "' did not pass schema validation." << std::endl;
+			std::string error_string = "Scenario file '" + path + "' did not pass schema validation.";
+			throw std::system_error(std::error_code(), error_string);
 		}
-
-		std::exit(1);
 	}
 
 	elevation_path_ = document["elevationPath"].GetString();

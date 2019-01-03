@@ -210,9 +210,8 @@ inline Raster<T>::~Raster(void) {
 */
 template<class T>
 inline int_t Raster<T>::index(double x, double y) const {
-	double transform[6];
+	double transform[6], inv_transform[6];
 	dataset_->GetGeoTransform(transform);
-	double inv_transform[6];
 	bool success = GDALInvGeoTransform(transform, inv_transform);
 
 	if (!success) {

@@ -4,16 +4,15 @@
 #include <common/raster.hpp>
 #include "input.hpp"
 
-class FloodFill {
+class CellularAutomata {
 public:
-	FloodFill(const Input& input);
+	CellularAutomata(const Input& input);
 	void Run(void);
-
-private:
 	void Grow(void);
 	void UpdateWetCells(void);
 	void WriteResults(void);
 
+private:
 	const Input* input_;
 	int_t num_seeds_, num_wet_;
 	Raster<prec_t> B_, w_, h_;

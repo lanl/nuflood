@@ -16,10 +16,8 @@ public:
 	bool Contains(const int_t i, const int_t j) const;
 	void Clear(void);
 
-	Map::iterator begin(void);
-	Map::iterator end(void);
-
-	int_t num_elements(void) const;
+	Map::iterator begin(void) { return map_.begin(); }
+	Map::iterator end(void) { return map_.end(); }
 	int_t num(void) { return num_; }
 
 private:

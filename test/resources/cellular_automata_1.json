@@ -1,6 +1,6 @@
 {
-    "elevationPath": "resources/elevation.asc",
-    "depthPath": "resources/depth.asc",
+    "elevationPath": "../test/resources/elevation.tif",
+    "waterSurfaceElevationPath": "../test/resources/waterSurfaceElevation.tif",
 	 "output": {
 		 "waterSurfaceElevationPath": "tmp/waterSurfaceElevation.tif",
 		 "depthPath": "tmp/depth.tif",

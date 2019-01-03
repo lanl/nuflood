@@ -8,10 +8,12 @@ bool IndexTable::Insert(const int_t i, const int_t j) {
 	Map::iterator row_found = map_.find(i);
 
 	if (row_found == map_.end()) {
+		num_ += 1;
 		map_.insert(std::make_pair(i, std::unordered_set<int_t>({j})));
 		return true;
 	} else {
 		if (row_found->second.find(j) == row_found->second.end()) {
+			num_ += 1;
 			row_found->second.insert(j);
 			return true;
 		} else {
@@ -41,16 +43,4 @@ bool IndexTable::Contains(const int_t i, const int_t j) const {
 void IndexTable::Clear(void) {
 	map_.clear();
 	num_ = 0;
-}
-
-int_t IndexTable::num_elements(void) const {
-	return num_;
-}
-
-Map::iterator IndexTable::begin(void) {
-	return map_.begin();
-}
-
-Map::iterator IndexTable::end(void) {
-	return map_.end();
 }

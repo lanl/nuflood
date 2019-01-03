@@ -1,5 +1,5 @@
 {
-    "elevationPath": "resources/elevation.asc",
+    "elevationPath": "../test/resources/elevation.tif",
     "pointSources": [
         {
             "x": 1.0,
