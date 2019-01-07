@@ -20,7 +20,7 @@ CellularAutomata::CellularAutomata(const Input& input) {
 		h_.Subtract(B_);
 	} else {
 		w_.CopyFrom(B_);
-		h_.CopyFrom(B_);
+		h_.CopyFrom(w_);
 		h_.Fill((prec_t)0);
 	}
 

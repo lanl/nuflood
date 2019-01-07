@@ -97,7 +97,7 @@ inline Raster<T>::Raster(void) {
 */
 template<class T>
 inline Raster<T>::Raster(std::string path, std::string name, GDALAccess access) {
-	Raster<T>::Read(path);
+	Raster<T>::Read(path, access);
 	name_ = name;
 }
 
@@ -114,7 +114,7 @@ inline Raster<T>::Raster(const Raster& raster, std::string path, std::string nam
 	nodata_ = raster.nodata();
 	GDALDataset* src = raster.dataset();
 	GDALDriver* driver = src->GetDriver();
-	dataset_ = driver->CreateCopy(path_.c_str(), src, false, NULL, NULL, NULL);
+	dataset_ = driver->CreateCopy(path_.c_str(), src, FALSE, NULL, NULL, NULL);
 	dataset_->GetGeoTransform(geo_transform_);
 	array_ = (T*)CPLMalloc(width()*height()*sizeof(T));
 	memcpy(array_, raster.array(), width()*height()*sizeof(T));
@@ -150,10 +150,10 @@ inline void Raster<T>::CopyFrom(const Raster& raster) {
 
 	if (path_.empty()) {
 		driver = GetGDALDriverManager()->GetDriverByName("MEM");
-		dataset_ = driver->CreateCopy("", src, false, NULL, NULL, NULL);
+		dataset_ = driver->CreateCopy("", src, FALSE, NULL, NULL, NULL);
 	} else {
 		driver = src->GetDriver();
-		dataset_ = driver->CreateCopy(path_.c_str(), src, false, NULL, NULL, NULL);
+		dataset_ = driver->CreateCopy(path_.c_str(), src, FALSE, NULL, NULL, NULL);
 	}
 
 	dataset_->GetGeoTransform(geo_transform_);

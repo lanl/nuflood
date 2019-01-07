@@ -2,8 +2,8 @@
     "elevationPath": "../test/resources/elevation.tif",
     "waterSurfaceElevationPath": "../test/resources/waterSurfaceElevation.tif",
 	 "output": {
-		 "waterSurfaceElevationPath": "tmp/waterSurfaceElevation.tif",
-		 "depthPath": "tmp/depth.tif",
-		 "summaryPath": "tmp/summary.json"
+		 "waterSurfaceElevationPath": "../test/resources/waterSurfaceElevation.out.tif",
+		 "depthPath": "../test/resources/depth.out.tif",
+		 "summaryPath": "../test/resources/summary.out.json"
 	 }
 }

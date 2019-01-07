@@ -42,7 +42,7 @@ TEST(Raster, ReadIncomplete) {
 
 TEST(Raster, CopyOverwrite) {
 	Raster<double> raster_1("../test/resources/elevation.tif", "elevation");
-	Raster<double> raster_2("../test/resources/depth.tif", "depth");
+	Raster<double> raster_2("../test/resources/elevation.tif", "elevationCopy");
 	raster_1.CopyFrom(raster_2);
 }
 
@@ -88,20 +88,20 @@ TEST(Raster, EqualDimensions) {
 }
 
 TEST(Raster, GetFromCoordinates) {
-	Raster<double> raster("../test/resources/elevation.tif", "raster");
+	Raster<double> raster("../test/resources/depth.tif", "raster");
 	double value = raster.GetFromCoordinates(8.0, 8.0);
 	EXPECT_EQ(value, 1.0);
 }
 
 TEST(Raster, GetFromIndices) {
-	Raster<double> raster("../test/resources/elevation.tif", "raster");
+	Raster<double> raster("../test/resources/depth.tif", "raster");
 	int_t i = 8, j = 8;
 	double value = raster.GetFromIndices(i, j);
 	EXPECT_EQ(value, 1.0);
 }
 
 TEST(Raster, GetFromIndex) {
-	Raster<double> raster("../test/resources/elevation.tif", "raster");
+	Raster<double> raster("../test/resources/depth.tif", "raster");
 	int_t index = raster.index(8.0, 8.0);
 	double value = raster.GetFromIndex(index);
 	EXPECT_EQ(value, 1.0);
