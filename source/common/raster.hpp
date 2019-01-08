@@ -53,16 +53,44 @@ public:
 	// Functions to check raster validity.
 	bool EqualDimensions(const Raster<T>& raster) const;
 
-	// Trivial getters.
+	//! Returns a pointer to the Raster data array.
+	/*! \return Pointer to the Raster data array. */
 	T* array(void) const { return array_; }
+	
+	//! Returns the nodata value for the Raster.
+	/*! \return nodata value for the Raster. */
 	T nodata(void) const { return nodata_; }
+	
+	//! Returns pointer to the <a href="https://www.gdal.org/classGDALDataset.html">GDALDataset</a> instance.
+	/*! \return Pointer to the <a href="https://www.gdal.org/classGDALDataset.html">GDALDataset</a> instance. */
 	GDALDataset* dataset(void) const { return dataset_; }
+	
+	//! Returns height (i.e., number of rows) of the Raster data.
+	/*! \return Height (i.e., number of rows) of the Raster data. */
 	int_t height(void) const { return dataset_->GetRasterBand(1)->GetYSize(); }
+	
+	//! Returns width (i.e., number of columns) of the Raster data.
+	/*! \return Height (i.e., number of columns) of the Raster data. */
 	int_t width(void) const { return dataset_->GetRasterBand(1)->GetXSize(); }
+	
+	//! Returns total number of pixels for the Raster data.
+	/*! \return Total number of pixels for the Raster data. */
 	int_t num_pixels(void) const { return width() * height(); }
+	
+	//! Returns the horizontal resolution of the Raster data.
+	/*! \return Horizontal resolution of the Raster data. */
 	double cellsize_x(void) const { return geo_transform_[1]; }
+	
+	//! Returns the vertical resolution of the Raster data.
+	/*! \return Vertical resolution of the Raster data. */
 	double cellsize_y(void) const { return -geo_transform_[5]; }
+	
+	//! Returns internal name (label) of the Raster.
+	/*! \return Internal name (label) of the Raster. */
 	std::string name(void) const { return name_; }
+	
+	//! Returns path to the Raster file on disk.
+	/*! \return Path to the Raster file on disk. */
 	std::string path(void) const { return path_; }
 
 protected:
@@ -90,10 +118,10 @@ inline Raster<T>::Raster(void) {
 
 //! Constructor for Raster.
 /*! \tparam Type of raster data. Default is double.
-	 \param path Path to raster file.
-	 \param name Name of the raster.
-	 \param access <a href="http://www.gdal.org/gdal_8h.html#a045e3967c208993f70257bfd40c9f1d7">
-	               Flag indicating read/write, or read-only access to raster</a>
+    \param path Path to raster file.
+    \param name Name of the raster.
+    \param access <a href="http://www.gdal.org/gdal_8h.html#a045e3967c208993f70257bfd40c9f1d7">
+    	          Flag indicating read/write, or read-only access to raster</a>
 */
 template<class T>
 inline Raster<T>::Raster(std::string path, std::string name, GDALAccess access) {
@@ -103,9 +131,9 @@ inline Raster<T>::Raster(std::string path, std::string name, GDALAccess access) 
 
 //! Constructor for Raster.
 /*! \tparam Type of raster data. Default is double.
-	 \param raster Raster from which data is copied.
-	 \param path Path to write Raster.
-	 \param name Name of the raster.
+    \param raster Raster from which data is copied.
+    \param path Path to write Raster.
+    \param name Name of the raster.
 */
 template<class T>
 inline Raster<T>::Raster(const Raster& raster, std::string path, std::string name) {
@@ -122,8 +150,8 @@ inline Raster<T>::Raster(const Raster& raster, std::string path, std::string nam
 
 //! Constructor for Raster.
 /*! \tparam Type of raster data. Default is double.
-	 \param raster Raster from which data is copied.
-	 \param name Name of the raster.
+    \param raster Raster from which data is copied.
+    \param name Name of the raster.
 */
 template<class T>
 inline Raster<T>::Raster(const Raster& raster, std::string name) {
@@ -133,7 +161,7 @@ inline Raster<T>::Raster(const Raster& raster, std::string name) {
 
 //! Copy another raster's data to this Raster.
 /*! \tparam Type of raster data. Default is double.
-	 \param raster Raster from which data is copied.
+    \param raster Raster from which data is copied.
 */
 template<class T>
 inline void Raster<T>::CopyFrom(const Raster& raster) {
@@ -205,8 +233,9 @@ inline Raster<T>::~Raster(void) {
 
 //! Returns the flattened raster pixel index for a given location.
 /*! \tparam Type of raster data. Default is double.
-	 \param x x-coordinate of the pixel.
-	 \param y y-coordinate of the pixel.
+    \param x x-coordinate of the pixel.
+    \param y y-coordinate of the pixel.
+    \return Flattened raster pixel index for the given coordinates.
 */
 template<class T>
 inline int_t Raster<T>::index(double x, double y) const {
@@ -233,7 +262,7 @@ inline int_t Raster<T>::index(double x, double y) const {
 
 //! Fills all pixels of a raster with a single value.
 /*! \tparam Type of raster data. Default is double.
-	 \param value Value with which to populate all pixels.
+    \param value Value with which to populate all pixels.
 */
 template<class T>
 inline void Raster<T>::Fill(T value) {
@@ -241,8 +270,7 @@ inline void Raster<T>::Fill(T value) {
 }
 
 //! Updates the raster file on disk using current data from `array_`.
-/*! \tparam Type of raster data. Default is double.
-*/
+/*! \tparam Type of raster data. Default is double. */
 template<class T>
 inline void Raster<T>::Update(void) {
 	GDALRasterBand* band = dataset_->GetRasterBand(1);
@@ -253,7 +281,7 @@ inline void Raster<T>::Update(void) {
 
 //! Write raster data to the specified path.
 /*! \tparam Type of raster data. Default is double.
-	 \param path Path to the which the raster will be written.
+    \param path Path to the which the raster will be written.
 */
 template<class T>
 inline void Raster<T>::Write(const std::string path) {
@@ -271,7 +299,8 @@ inline void Raster<T>::Write(const std::string path) {
 
 //! Returns if the dimensions of the current raster are equivalent to another.
 /*! \tparam Type of raster data. Default is double.
-	 \param raster Raster used for the comparison.
+    \param raster Raster used for the comparison.
+    \return True if Raster dimensions are equal, false if not.
 */
 template<class T>
 inline bool Raster<T>::EqualDimensions(const Raster<T>& raster) const {
@@ -280,8 +309,9 @@ inline bool Raster<T>::EqualDimensions(const Raster<T>& raster) const {
 
 //! Returns the pixel value at the specified coordinates.
 /*! \tparam Type of raster data. Default is double.
-	 \param x x-coordinate of the pixel.
-	 \param y y-coordinate of the pixel.
+    \param x x-coordinate of the pixel.
+    \param y y-coordinate of the pixel.
+    \return Pixel value at the specified coordinates.
 */
 template<class T>
 inline T Raster<T>::GetFromCoordinates(const double x, const double y) const {
@@ -291,8 +321,9 @@ inline T Raster<T>::GetFromCoordinates(const double x, const double y) const {
 
 //! Returns the pixel value at the specified indices.
 /*! \tparam Type of raster data. Default is double.
-	 \param i Row index of the pixel.
-	 \param j Column index of the pixel.
+    \param i Row index of the pixel.
+    \param j Column index of the pixel.
+    \return Pixel value at the specified indices.
 */
 template<class T>
 inline T Raster<T>::GetFromIndices(const int_t i, const int_t j) const {
@@ -302,7 +333,8 @@ inline T Raster<T>::GetFromIndices(const int_t i, const int_t j) const {
 
 //! Returns the pixel value at the specified flattened index.
 /*! \tparam Type of raster data. Default is double.
-	 \param index Flattened index of the pixel (i.e., row * width + column).
+    \param index Flattened index of the pixel (i.e., row * width + column).
+    \return Pixel value at the specified flattened index.
 */
 template<class T>
 inline T Raster<T>::GetFromIndex(const int_t index) const {
@@ -311,9 +343,9 @@ inline T Raster<T>::GetFromIndex(const int_t index) const {
 
 //! Sets the pixel value at the specified coordinates.
 /*! \tparam Type of raster data. Default is double.
-	 \param x x-coordinate of the pixel.
-	 \param y y-coordinate of the pixel.
-	 \param value New value of the pixel.
+    \param x x-coordinate of the pixel.
+    \param y y-coordinate of the pixel.
+    \param value New value of the pixel.
 */
 template<class T>
 inline void Raster<T>::SetAtCoordinates(const double x, const double y, T value) {
@@ -323,9 +355,9 @@ inline void Raster<T>::SetAtCoordinates(const double x, const double y, T value)
 
 //! Sets the pixel value at the specified indices.
 /*! \tparam Type of raster data. Default is double.
-	 \param i Row index of the pixel.
-	 \param j Column index of the pixel.
-	 \param value New value of the pixel.
+    \param i Row index of the pixel.
+    \param j Column index of the pixel.
+    \param value New value of the pixel.
 */
 template<class T>
 inline void Raster<T>::SetAtIndices(const int_t i, const int_t j, T value) {
@@ -335,8 +367,8 @@ inline void Raster<T>::SetAtIndices(const int_t i, const int_t j, T value) {
 
 //! Sets the pixel value at the specified flattened index.
 /*! \tparam Type of raster data. Default is double.
-	 \param index Flattened index of the pixel (i.e., row * width + column).
-	 \param value New value of the pixel.
+    \param index Flattened index of the pixel (i.e., row * width + column).
+    \param value New value of the pixel.
 */
 template<class T>
 inline void Raster<T>::SetAtIndex(const int_t index, const T value) {
@@ -345,7 +377,7 @@ inline void Raster<T>::SetAtIndex(const int_t index, const T value) {
 
 //! Elementwise addition of the raster with another.
 /*! \tparam Type of raster data. Default is double.
-	 \param reference Raster from which pixel values will be elementwise added.
+    \param reference Raster from which pixel values will be elementwise added.
 */
 template<class T>
 inline void Raster<T>::Add(const Raster<T>& reference) {
@@ -367,7 +399,7 @@ inline void Raster<T>::Add(const Raster<T>& reference) {
 
 //! Elementwise subtraction of the raster with another.
 /*! \tparam Type of raster data. Default is double.
-	 \param reference Raster from which pixel values will be elementwise subtracted.
+    \param reference Raster from which pixel values will be elementwise subtracted.
 */
 template<class T>
 inline void Raster<T>::Subtract(const Raster<T>& reference) {
