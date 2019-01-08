@@ -5,7 +5,7 @@
 #include <omp.h>
 #endif
 
-CellularAutomata::CellularAutomata(const Input& input) {
+CellularAutomata::CellularAutomata(const CellularAutomataInput& input) {
 	input_ = &input;
 	num_seeds_ = num_wet_ = 0;
 	B_.Read(input.elevation_path());

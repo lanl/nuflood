@@ -5,7 +5,7 @@ int main(int argc, char* argv[]) {
 	// Check if a scenario file has been specified.
 	if (argc > 1) {
 		// Read in the input.
-		Input input(argv[1]);
+		CellularAutomataInput input(argv[1]);
 
 		// Set up the model.
 		CellularAutomata cellular_automata(input);

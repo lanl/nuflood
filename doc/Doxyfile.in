@@ -765,7 +765,11 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = README.md \
+                         source/common/index_table.cpp \
+                         source/common/index_table.h \
                          source/common/raster.hpp \
+                         source/models/cellular_automata/cellular_automata_input.h \
+                         source/models/cellular_automata/cellular_automata_input.cpp \
                          doc/faq.md
 
 # This tag can be used to specify the character encoding of the source files
@@ -1124,7 +1128,7 @@ HTML_EXTRA_STYLESHEET  = ./doc/misc/doxygenextra.css
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       =
+HTML_EXTRA_FILES       = ./resources/cellularAutomata.schema.json
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the stylesheet and background images according to

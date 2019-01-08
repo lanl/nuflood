@@ -1,41 +1,11 @@
-#pragma once
-
-#include <iostream>
-#include <vector>
-#include <rapidjson/filereadstream.h>
-#include <rapidjson/document.h>
-#include <rapidjson/schema.h>
-#include <rapidjson/stringbuffer.h>
+#include "cellular_automata_input.h"
 #include "point_source.h"
-#include "schema.h"
 
-class Input {
-public:
-	// Constructor.
-	Input(std::string path);
-
-	// Getters.
-	const std::string elevation_path(void) const { return elevation_path_; }
-	const std::string depth_path(void) const { return depth_path_; }
-	const std::string wse_path(void) const { return wse_path_; }
-	const std::string output_depth_path(void) const { return output_depth_path_; }
-	const std::string output_wse_path(void) const { return output_wse_path_; }
-	const std::string output_summary_path(void) const { return output_summary_path_; }
-	const std::vector<PointSource>& point_sources_depth(void) const { return point_sources_depth_; }
-	const std::vector<PointSource>& point_sources_wse(void) const { return point_sources_wse_; }
-
-protected:
-	std::string elevation_path_;
-	std::string depth_path_;
-	std::string wse_path_; // wse := water surface elevation
-	std::string output_depth_path_;
-	std::string output_wse_path_;
-	std::string output_summary_path_;
-	std::vector<PointSource> point_sources_depth_;
-	std::vector<PointSource> point_sources_wse_;
-};
-
-inline Input::Input(std::string path) {
+//! Constructor for CellularAutomataInput.
+/*! \param path Path to the JSON document defining model parameters.
+ * The JSON must conform to the <a href="cellularAutomata.schema.json">JSON
+ * Schema</a>. */
+CellularAutomataInput::CellularAutomataInput(std::string path) {
 	// Create the schema document object.
 	rapidjson::Document schema_document;
 	schema_document.Parse(CELLULARAUTOMATA_SCHEMA);
