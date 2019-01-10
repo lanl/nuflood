@@ -773,6 +773,8 @@ INPUT                  = README.md \
                          source/common/index_table.cpp \
                          source/common/index_table.h \
                          source/common/raster.hpp \
+                         source/models/cellular_automata/cellular_automata.h \
+                         source/models/cellular_automata/cellular_automata.cpp \
                          source/models/cellular_automata/cellular_automata_input.h \
                          source/models/cellular_automata/cellular_automata_input.cpp
 

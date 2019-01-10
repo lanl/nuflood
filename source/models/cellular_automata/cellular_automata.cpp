@@ -5,6 +5,12 @@
 #include <omp.h>
 #endif
 
+/*!
+ * \brief Constructor for CellularAutomata.
+ * Initializes data associated with the cellular automata algorithm, e.g.,
+ * depth and water surface elevation rasters.
+ * \param input Reference to the CellularAutomataInput instance.
+ */
 CellularAutomata::CellularAutomata(const CellularAutomataInput& input) {
 	input_ = &input;
 	num_seeds_ = num_wet_ = 0;
@@ -58,6 +64,7 @@ CellularAutomata::CellularAutomata(const CellularAutomataInput& input) {
 	}
 }
 
+//! Grows seed cells (i.e., positions of the automata) outward, where applicable. Should be called before CellularAutomata::UpdateWetCells.
 void CellularAutomata::Grow(void) {
 	seed_holder_.Clear();
 
@@ -102,6 +109,7 @@ void CellularAutomata::Grow(void) {
 	}
 }
 
+//! Updates IndexTable instances that contain seed and wet cell indices. Should be called after CellularAutomata::Grow.
 void CellularAutomata::UpdateWetCells(void) {
 	seed_.Clear();
 	num_seeds_ = 0;
@@ -116,11 +124,13 @@ void CellularAutomata::UpdateWetCells(void) {
 	}
 }
 
+//! Writes resultant depth and water surface elevation rasters to disk.
 void CellularAutomata::WriteResults(void) {
 	if (!input_->output_depth_path().empty()) h_.Write(input_->output_depth_path());
 	if (!input_->output_wse_path().empty()) w_.Write(input_->output_wse_path());
 }
 
+//! Executes the entirety of the CellularAutomata model instance and writes model results to disk.
 void CellularAutomata::Run(void) {
 	while (num_seeds_ > 0) {
 		CellularAutomata::Grow();

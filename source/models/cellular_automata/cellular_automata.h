@@ -4,9 +4,11 @@
 #include <common/raster.hpp>
 #include "cellular_automata_input.h"
 
+//! Class that manages execution of the cellular automata algorithm.
 class CellularAutomata {
 public:
 	CellularAutomata(const CellularAutomataInput& input);
+
 	void Run(void);
 	void Grow(void);
 	void UpdateWetCells(void);
