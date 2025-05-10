@@ -36,6 +36,15 @@ To compile the application:
 
 ## Usage at a glance
 
+## Usage at a glance
+To simulate a modeling scenario, execute a command similar to
+```bash
+/path/to/nuflood/executables/kurganov_petrova example.json
+```
+where `/path/to/nuflood/executables/kurganov_petrova` is the system path to the compiled Kurganov-Petrova simulation model and `example.json` is a path to the scenario input file.
+
+For scenario examples, please visit the [Nuflood examples project](https://github.com/tasseff/nuflood-examples).
+
 ## License
 [BSD-ish](https://github.com/lanl/nuflood/blob/master/LICENSE.md)
 
