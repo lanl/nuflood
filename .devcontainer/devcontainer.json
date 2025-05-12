@@ -1,0 +1,22 @@
+{
+  "name": "Nuflood Development",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "github.copilot",
+        "github.copilot-chat",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "cmake.configureOnOpen": true,
+        "editor.formatOnSave": false
+      }
+    }
+  },
+  "remoteUser": "vscode"
+}
