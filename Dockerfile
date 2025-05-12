@@ -1,7 +1,5 @@
 FROM ubuntu:14.04
 
-MAINTAINER Byron Tasseff <byron@tasseff.com>
-
 ENV HOME /root
 WORKDIR $HOME/
 
