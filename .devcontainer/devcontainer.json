@@ -10,11 +10,14 @@
         "ms-vscode.cmake-tools",
         "github.copilot",
         "github.copilot-chat",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.cpptools-extension-pack"
       ],
       "settings": {
         "cmake.configureOnOpen": true,
-        "editor.formatOnSave": false
+        "editor.formatOnSave": true,
+        "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+        "C_Cpp.codeAnalysis.runAutomatically": true
       }
     }
   },
