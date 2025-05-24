@@ -4,14 +4,14 @@
 
 class Folder {
 public:
-	Folder(void);
+	Folder();
 	Folder(const std::string& path);
 
-	bool Exists(void) const;
+	auto Exists() const -> bool;
 	void Set(std::string path);
-	void Clear(void);
+	void Clear();
 
-	std::string path(void) const { return path_; }
+	auto path() const -> std::string { return path_; }
 
 private:
 	std::string path_;
