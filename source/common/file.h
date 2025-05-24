@@ -3,24 +3,24 @@
 #include <string>
 
 class File {
-public:
-	File(const std::string path);
-	File(void);
+  public:
+    File(std::string path);
+    File();
 
-	void Load(const std::string path);
-	void Clear(void);
-	void ClearPath(void);
-	void ClearContent(void);
-	bool Exists(void) const;
-	bool IsEmpty(void) const;
+    void Load(std::string path);
+    void Clear();
+    void ClearPath();
+    void ClearContent();
+    auto Exists() const -> bool;
+    auto IsEmpty() const -> bool;
 
-	std::string path() const { return path_; }
-	std::string folder_path() const { return folder_path_; }
-	std::string content() const { return content_; }
-	void set_path(const std::string path) { path_ = path; }
+    auto path() const -> std::string { return path_; }
+    auto folder_path() const -> std::string { return folder_path_; }
+    auto content() const -> std::string { return content_; }
+    void set_path(const std::string path) { path_ = path; }
 
-private:
-	std::string path_;
-	std::string folder_path_;
-	std::string content_;
+  private:
+    std::string path_;
+    std::string folder_path_;
+    std::string content_;
 };

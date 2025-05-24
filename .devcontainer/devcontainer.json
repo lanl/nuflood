@@ -17,7 +17,10 @@
         "cmake.configureOnOpen": true,
         "editor.formatOnSave": true,
         "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-        "C_Cpp.codeAnalysis.runAutomatically": true
+        "C_Cpp.codeAnalysis.runAutomatically": true,
+        "C_Cpp.codeAnalysis.exclude": {
+          "libraries/**": true
+        }
       }
     }
   },
