@@ -1,40 +1,33 @@
+#include "folder.h"
+#include "error.h"
+#include <fstream>
 #include <sstream>
 #include <string>
-#include <fstream>
-#include "error.h"
-#include "folder.h"
 
-Folder::Folder(void) {
-	path_ = "";
-}
+Folder::Folder() = default;
 
-Folder::Folder(const std::string& path) {
-	Set(path);
-}
+Folder::Folder(const std::string &path) { Set(path); }
 
 void Folder::Set(std::string path) {
-	path_ = path;
+    path_ = path;
 
-	if (!path_.empty() && *path_.rbegin() != '/') {
-		path_ = path_ + '/';
-	}
+    if (!path_.empty() && *path_.rbegin() != '/') {
+        path_ = path_ + '/';
+    }
 
-	if (!Exists()) {
-		PrintErrorAndExit("Folder '" + path_ + "' does not exist.");
-	}
+    if (!Exists()) {
+        PrintErrorAndExit("Folder '" + path_ + "' does not exist.");
+    }
 }
 
-void Folder::Clear(void) {
-	path_ = "";
-}
+void Folder::Clear() { path_ = ""; }
 
-bool Folder::Exists(void) const {
-	std::ifstream f(path_);
-	if (f.good()) {
-		f.close();
-		return true;
-	} else {
-		f.close();
-		return false;
-	}
+auto Folder::Exists() const -> bool {
+    std::ifstream file_stream(path_);
+    if (file_stream.good()) {
+        file_stream.close();
+        return true;
+    }
+    file_stream.close();
+    return false;
 }
