@@ -1,6 +1,6 @@
-FROM ubuntu:14.04
+FROM ubuntu:24.04
 
-ENV HOME /root
+ENV HOME=/root
 WORKDIR $HOME/
 
 ADD . nuflood/
