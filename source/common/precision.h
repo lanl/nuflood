@@ -5,9 +5,9 @@
 #endif
 
 #if USE_DOUBLE
-typedef double prec_t;
+using prec_t = double;
 #else
-typedef float prec_t;
+using prec_t = float;
 #endif
 
 #ifdef BIG_GRID
