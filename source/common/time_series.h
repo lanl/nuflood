@@ -42,10 +42,11 @@ template <class T> void TimeSeries<T>::Load(const File &file) {
 
     while (std::getline(input, line)) {
         // Remove white space from the beginning of the string.
-        line.erase(
-            line.begin(),
-            std::find_if(line.begin(), line.end(),
-                         std::not1(std::ptr_fun<int, int>(std::isspace))));
+        line.erase(line.begin(),
+                   std::find_if(line.begin(), line.end(),
+                                [](unsigned char character) -> bool {
+                                    return !std::isspace(character);
+                                }));
 
         // If the line of the file begins with '#', skip it.
         if (line[0] == '#') {
