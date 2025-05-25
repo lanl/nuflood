@@ -41,7 +41,7 @@ jobs:
       run: |
         # Generate coverage.info file for codecov
         lcov --directory . --capture --output-file coverage.info
-        lcov --remove coverage.info 'tests/*' '/usr/*' '*/libraries/rapidjson/*' --output-file coverage.info.cleaned
+        lcov --remove coverage.info '/usr/*' '*/libraries/rapidjson/*' --output-file coverage.info.cleaned
         cp coverage.info.cleaned coverage.info
 
     - name: List coverage files (debug)
