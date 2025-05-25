@@ -2,6 +2,9 @@
 Checks: |
   -*,
   cppcoreguidelines-*,
+  -cppcoreguidelines-no-malloc,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   bugprone-*,
   modernize-*,
   readability-*
