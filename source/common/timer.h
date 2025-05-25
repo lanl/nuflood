@@ -7,20 +7,20 @@
 #endif
 
 class Timer {
-public:
-	Timer(void);
-	void Start(void);
-	void Stop(void);
-	void Reset(void);
-	double SecondsElapsed(void);
+  public:
+    Timer();
+    void Start();
+    void Stop();
+    void Reset();
+    auto SecondsElapsed() const -> double;
 
-protected:
+  private:
 #ifdef _WIN32
-	LARGE_INTEGER frequency_;
-	LARGE_INTEGER start_;
-	LARGE_INTEGER end_;
+    LARGE_INTEGER frequency_;
+    LARGE_INTEGER start_;
+    LARGE_INTEGER end_;
 #else
-	struct timeval start_;
-	struct timeval end_;
+    struct timeval start_;
+    struct timeval end_;
 #endif
 };
