@@ -2,12 +2,12 @@
 
 ## Build status
 
-| [Linux][lin-link] | [Codecov][cov-link] |
-| :---------------: | :-------------------: |
-| ![lin-badge]      | ![cov-badge]          |
+| [Status][status-link]          | [Coverage][cov-link]      |
+| :----------------------------: | :----------------------: |
+| [![status-badge]][status-link] | [![cov-badge]][cov-link] |
 
-[lin-badge]: https://travis-ci.org/lanl/nuflood.svg?branch=master "Travis build status"
-[lin-link]: https://travis-ci.org/lanl/nuflood "Travis build status"
+[status-badge]: https://github.com/lanl/nuflood/workflows/CI/badge.svg
+[status-link]: https://github.com/lanl/nuflood/actions?query=workflow%3ACI
 [cov-badge]: https://codecov.io/gh/lanl/nuflood/branch/master/graph/badge.svg
 [cov-link]: https://codecov.io/gh/lanl/nuflood
 
@@ -15,7 +15,7 @@
 
 Nuflood uses the following software as its dependencies:
 
-* CMake >= 2.8
+* CMake >= 3.5
 * gcc >= 4.8.4
 
 To retrieve dependencies included as submodules (e.g., rapidjson), run:
