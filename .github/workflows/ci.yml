@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake lcov
+
+    - name: Create build directory
+      run: mkdir -p build
+
+    - name: Configure CMake
+      working-directory: build
+      run: cmake -DCMAKE_BUILD_TYPE=Coverage ..
+
+    - name: Build project
+      working-directory: build
+      run: make -j$(nproc)
+
+    - name: Run coverage target
+      working-directory: build
+      run: make nuflood_coverage
+
+    - name: Generate codecov-compatible coverage file
+      working-directory: build
+      run: |
+        # Generate coverage.info file for codecov
+        lcov --directory . --capture --output-file coverage.info
+        lcov --remove coverage.info 'tests/*' '/usr/*' '*/libraries/rapidjson/*' --output-file coverage.info.cleaned
+        cp coverage.info.cleaned coverage.info
+
+    - name: List coverage files (debug)
+      working-directory: build
+      run: |
+        echo "Coverage files in build directory:"
+        find . -name "*.info*" -o -name "*.lcov" -o -name "coverage.*" 2>/dev/null || echo "No .info/.lcov files found"
+        echo "Coverage directory contents:"
+        ls -la coverage/ 2>/dev/null || echo "No coverage directory found"
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./build
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
